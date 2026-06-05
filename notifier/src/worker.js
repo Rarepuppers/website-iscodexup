@@ -1,16 +1,9 @@
-// ─────────────────────────────────────────────────────────────────────────
-// iscodexup recovery notifier — Cloudflare Worker (cron-triggered).
+// iscodexup recovery notifier - Cloudflare Worker (cron-triggered).
 //
 // Runs every minute (see wrangler.toml [triggers]). It polls the official
-// Statuspage summary, remembers the previous state in KV, and when the service
-// transitions from a real outage back to fully operational, it sends ONE Brevo
-// campaign to the notify list. Flap protection stops blips from spamming people.
-//
-// The browser/static site can't do this (only runs in an open tab, can't hold a
-// secret API key). This Worker is the always-on "watcher" that closes that gap.
-//
-// Config: see wrangler.toml [vars]. Secret: BREVO_API_KEY (wrangler secret put).
-// ─────────────────────────────────────────────────────────────────────────
+// Statuspage summary, scopes the result to configured Codex-related components,
+// remembers the previous state in KV, and sends one Brevo campaign when a real
+// outage recovers. Flap protection stops blips from spamming people.
 
 const STATE_KEY = "notifier:state";
 
@@ -22,15 +15,12 @@ function cfg(env) {
     senderEmail: env.SENDER_EMAIL,
     product: env.PRODUCT || "the service",
     siteUrl: env.SITE_URL || "",
-    // Which Statuspage indicators count as a real outage worth notifying recovery from.
-    // Default: only major/critical (a "minor"/degraded blip won't trigger a blast).
+    componentInclude: (env.COMPONENT_INCLUDE || "")
+      .split(",").map((s) => s.trim()).filter(Boolean),
     outageIndicators: (env.OUTAGE_INDICATORS || "major,critical")
       .split(",").map((s) => s.trim()).filter(Boolean),
-    // An outage must last at least this long before its recovery is worth emailing.
     minOutageMs: Number(env.MIN_OUTAGE_MINUTES || "3") * 60000,
-    // Require this many consecutive "fully operational" ticks before declaring recovery.
     upConfirmTicks: Number(env.UP_CONFIRM_TICKS || "2"),
-    // Don't send two recovery emails within this window (belt-and-suspenders).
     cooldownMs: Number(env.NOTIFY_COOLDOWN_MINUTES || "30") * 60000,
   };
 }
@@ -51,7 +41,32 @@ function saveState(env, state) {
   return env.STATE.put(STATE_KEY, JSON.stringify(state));
 }
 
-// Earliest active incident id (for de-dup / logging).
+function filteredComponents(data, c) {
+  let comps = (data.components || []).filter((component) => !component.group);
+  if (c.componentInclude.length) {
+    const want = c.componentInclude.map((s) => s.toLowerCase());
+    comps = comps.filter((component) => want.includes((component.name || "").toLowerCase()));
+  }
+  return comps;
+}
+
+function indicatorFromComponentStatus(status) {
+  const s = String(status || "operational").toLowerCase();
+  if (s === "major_outage" || s === "partial_outage") return "major";
+  if (s === "degraded_performance" || s === "under_maintenance") return "minor";
+  return "none";
+}
+
+function scopedIndicator(data, c) {
+  const comps = filteredComponents(data, c);
+  if (!comps.length) return (data.status && data.status.indicator) || "none";
+
+  const indicators = comps.map((component) => indicatorFromComponentStatus(component.status));
+  if (indicators.includes("major")) return "major";
+  if (indicators.includes("minor")) return "minor";
+  return "none";
+}
+
 function activeIncidentId(data) {
   const inc = (data.incidents || [])[0];
   return inc ? inc.id : null;
@@ -61,32 +76,29 @@ async function tick(env, { force = false } = {}) {
   const c = cfg(env);
   const now = Date.now();
   const state = await loadState(env);
-  const before = JSON.stringify(state); // only write KV if something actually changes (free-tier friendly)
+  const before = JSON.stringify(state);
 
   const res = await fetch(c.statusUrl, { cf: { cacheTtl: 0 }, headers: { "cache-control": "no-store" } });
   if (!res.ok) {
     console.log(`status fetch failed: ${res.status}`);
     return { action: "fetch-error", status: res.status };
   }
+
   const data = await res.json();
-  const indicator = (data.status && data.status.indicator) || "none";
+  const indicator = scopedIndicator(data, c);
   const isOutageNow = c.outageIndicators.includes(indicator);
   const isFullyUp = indicator === "none";
-
   let action = "noop";
 
   if (isOutageNow) {
     if (!state.inOutage) {
       state.inOutage = true;
       state.outageStart = now;
-      state.lastNotifiedIncidentId = activeIncidentId(data); // remember which incident
+      state.lastNotifiedIncidentId = activeIncidentId(data);
       action = "outage-detected";
     }
     state.upStreak = 0;
   } else {
-    // Not in a counted outage. Only a *fully operational* reading advances recovery.
-    // Cap the streak at the confirm threshold so steady-up ticks stop mutating state
-    // (otherwise upStreak would grow every minute and force a KV write every minute).
     state.upStreak = isFullyUp ? Math.min(state.upStreak + 1, c.upConfirmTicks) : 0;
 
     const confirmed = force || state.upStreak >= c.upConfirmTicks;
@@ -95,13 +107,12 @@ async function tick(env, { force = false } = {}) {
 
     if (state.inOutage && confirmed) {
       if (lastedLongEnough && outOfCooldown) {
-        await sendRecoveryCampaign(env, c, { outageStart: state.outageStart, now });
+        await sendRecoveryCampaign(env, c, { now });
         state.lastNotifiedAt = now;
         action = "recovery-sent";
       } else {
         action = lastedLongEnough ? "recovery-skipped-cooldown" : "recovery-skipped-too-brief";
       }
-      // Clear the outage either way (brief blips shouldn't linger as "in outage").
       state.inOutage = false;
       state.outageStart = null;
       state.lastNotifiedIncidentId = null;
@@ -109,10 +120,8 @@ async function tick(env, { force = false } = {}) {
   }
 
   state.lastIndicator = indicator;
-  // Write only when state changed — during steady operation this is a no-op, so KV
-  // writes stay far under the free-tier 1,000/day (only transitions/recovery write).
   if (JSON.stringify(state) !== before) await saveState(env, state);
-  console.log(`tick: indicator=${indicator} action=${action} upStreak=${state.upStreak}`);
+  console.log(`tick: scopedIndicator=${indicator} action=${action} upStreak=${state.upStreak}`);
   return { action, indicator, state };
 }
 
@@ -122,20 +131,19 @@ function recoveryEmailHtml(c) {
     : "";
   return `<!DOCTYPE html><html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#0f0f12;color:#eaeaf0;padding:32px">
     <div style="max-width:480px;margin:0 auto;text-align:center">
-      <h1 style="font-size:32px;margin:0 0 8px">✅ ${c.product} is back up</h1>
-      <p style="color:#a8a8b8;font-size:16px;line-height:1.5">The official status page is reporting all systems operational again. Back to work.</p>
+      <h1 style="font-size:32px;margin:0 0 8px">${c.product} is back up</h1>
+      <p style="color:#a8a8b8;font-size:16px;line-height:1.5">The Codex-related components on the official status page are operational again. Back to work.</p>
       ${link}
       <p style="color:#6a6a78;font-size:12px;margin-top:32px">You're getting this because you asked to be notified when ${c.product} recovered.
       {{ unsubscribe }}</p>
     </div></body></html>`;
 }
 
-// Creates a Brevo campaign targeting the notify list, then sends it immediately.
 async function sendRecoveryCampaign(env, c, { now }) {
   const stamp = new Date(now).toISOString().slice(0, 16).replace("T", " ");
   const body = {
     name: `${c.product} recovered ${stamp} UTC`,
-    subject: `✅ ${c.product} is back up`,
+    subject: `${c.product} is back up`,
     sender: { name: c.senderName, email: c.senderEmail },
     htmlContent: recoveryEmailHtml(c),
     recipients: { listIds: [c.listId] },
@@ -166,13 +174,10 @@ async function sendRecoveryCampaign(env, c, { now }) {
 }
 
 export default {
-  // Cron entrypoint — the real driver.
   async scheduled(event, env, ctx) {
     ctx.waitUntil(tick(env));
   },
 
-  // HTTP entrypoint — debugging only. /state shows KV; /test-tick runs one tick
-  // (guarded by ADMIN_KEY); /test-send forces a recovery email (guarded).
   async fetch(req, env) {
     const url = new URL(req.url);
     const authed = env.ADMIN_KEY && url.searchParams.get("key") === env.ADMIN_KEY;

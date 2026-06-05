@@ -1,47 +1,41 @@
-# Cloudflare Worker — recovery notifier. Deploy with `wrangler deploy` from this folder.
-# See README.md for first-time setup (KV namespace, secret, sender, list id).
+# Cloudflare Worker - recovery notifier. Deploy with `wrangler deploy` from this folder.
+# See README.md for first-time setup: KV namespace, secrets, sender, and list id.
 name = "iscodexup-notifier"
 main = "src/worker.js"
 compatibility_date = "2025-01-01"
 
-# Cron: every minute. (Cloudflare's smallest interval — best "the second it's back".)
+# Cron: every minute. Cloudflare's smallest interval.
 [triggers]
 crons = ["* * * * *"]
 
-# Persistent state between ticks (last status, outage start, up-streak, last-notified).
-# Create with: wrangler kv namespace create STATE  → paste the returned id below.
-# TODO(iscodexup): this is a FRESH namespace — run the command above and replace the id.
+# Create with: wrangler kv namespace create STATE
+# TODO(iscodexup): replace this with the new KV namespace id before deploying.
 [[kv_namespaces]]
 binding = "STATE"
 id = "REPLACE_WITH_NEW_KV_NAMESPACE_ID"
 
 [vars]
-# Same status feed the site reads.
 STATUS_URL = "https://status.openai.com/api/v2/summary.json"
 
-# Brevo list to notify + verified sender. BREVO_LIST_ID is the numeric id of your
-# double-opt-in notify list. SENDER_EMAIL must be a Brevo-verified sender/domain.
-# TODO(iscodexup): set the numeric id of the NEW Codex notify list (Brevo → Contacts → Lists).
+# OpenAI exposes many services. Recovery email state is scoped to these components.
+COMPONENT_INCLUDE = "Codex API,CLI,VS Code extension,Login,Realtime"
+
+# TODO(iscodexup): set the numeric id of the new Codex notify list in Brevo.
 BREVO_LIST_ID = "REPLACE_WITH_CODEX_NOTIFY_LIST_ID"
 SENDER_NAME = "Is Codex Up"
-# TODO(iscodexup): authenticate iscodexup.com in Brevo (DKIM + DMARC) before this sender works.
+# TODO(iscodexup): authenticate iscodexup.com in Brevo before this sender works.
 SENDER_EMAIL = "notify@iscodexup.com"
 
-# Copy/branding used in the email.
 PRODUCT = "Codex"
 SITE_URL = "https://iscodexup.com"
 
-# Tuning. Which indicators count as a real outage (recovery from a "minor"/degraded
-# blip will NOT email unless you add "minor"). Then: minimum outage length before a
-# recovery is worth emailing, consecutive all-clear ticks to confirm, and a cooldown.
+# Only major component issues trigger a recovery email. Minor/degraded blips are shown
+# on the site but do not send a recovery blast unless you add "minor" here.
 OUTAGE_INDICATORS = "major,critical"
 MIN_OUTAGE_MINUTES = "3"
 UP_CONFIRM_TICKS = "2"
-# Min gap between two recovery emails. Collapses a flapping incident (down-up-down-up
-# over an hour or two) into ONE email. 180 = 3h. For a strict "max one email per day"
-# set 1440 — but that can suppress the recovery of a genuinely separate later incident.
 NOTIFY_COOLDOWN_MINUTES = "180"
 
-# Secrets (do NOT put these here — set via `wrangler secret put`):
-#   BREVO_API_KEY  — Brevo API v3 key
-#   ADMIN_KEY      — optional, guards the /test-tick and /test-send debug routes
+# Secrets, set with `wrangler secret put`:
+#   BREVO_API_KEY
+#   ADMIN_KEY

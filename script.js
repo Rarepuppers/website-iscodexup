@@ -1,6 +1,6 @@
-// iscodexup.com — pure client-side, no backend.
+// iscodexup.com - pure client-side, no backend.
 // Reads the official Statuspage API live (CORS is open: Access-Control-Allow-Origin: *).
-// Product-specific values (status URL, copy, art, quotes) live in config.js → window.SITE.
+// Product-specific values (status URL, copy, art, quotes) live in config.js -> window.SITE.
 
 const STATUS_URL = SITE.statusUrl;
 
@@ -18,37 +18,75 @@ const els = {
 };
 
 const ROBOTS = SITE.robots;
-// Button: default (resting) until status is known, then green (up) / red (down).
 const DEFAULT_BUTTON = SITE.buttons.default;
 const BUTTONS = {
   up: SITE.buttons.up,
-  degraded: DEFAULT_BUTTON, // intermittent: keep the neutral button
+  degraded: DEFAULT_BUTTON,
   down: SITE.buttons.down,
 };
-// Warm the cache for the other states so swaps are instant
+
 [...Object.values(ROBOTS), ...Object.values(BUTTONS), DEFAULT_BUTTON].forEach((src) => {
   const i = new Image();
   i.src = src;
 });
 
 // ---------- THE VERDICT ----------
-// Statuspage indicator values: "none" | "minor" | "major" | "critical"
-function render(data) {
-  const indicator = data?.status?.indicator || "none";
-  let state, verdict, subline;
+function filteredComponents(data) {
+  let comps = (data.components || []).filter((c) => !c.group);
+  const compCfg = SITE.components || {};
 
-  if (indicator === "none") {
-    state = "up";
+  if (Array.isArray(compCfg.include) && compCfg.include.length) {
+    const want = compCfg.include.map((s) => s.toLowerCase());
+    comps = comps.filter((c) => want.includes((c.name || "").toLowerCase()));
+  }
+
+  return comps;
+}
+
+function stateFromComponentStatus(status) {
+  const s = String(status || "operational").toLowerCase();
+  if (s === "major_outage" || s === "partial_outage") return "down";
+  if (s === "degraded_performance" || s === "under_maintenance") return "degraded";
+  return "up";
+}
+
+function stateFromComponents(comps) {
+  if (!comps.length) return null;
+  const states = comps.map((c) => stateFromComponentStatus(c.status));
+  if (states.includes("down")) return "down";
+  if (states.includes("degraded")) return "degraded";
+  return "up";
+}
+
+function stateFromPageIndicator(indicator) {
+  if (indicator === "none") return "up";
+  if (indicator === "minor") return "degraded";
+  return "down";
+}
+
+function render(data) {
+  const pageIndicator = data?.status?.indicator || "none";
+  const compCfg = SITE.components || {};
+  const scopedComps = filteredComponents(data);
+  const scopedState = compCfg.statusSource === "components" ? stateFromComponents(scopedComps) : null;
+  const state = scopedState || stateFromPageIndicator(pageIndicator);
+  let verdict, subline;
+
+  if (state === "up") {
     verdict = SITE.copy.up.verdict;
     subline = SITE.copy.up.subline;
-  } else if (indicator === "minor") {
-    state = "degraded";
+  } else if (state === "degraded") {
+    const affected = scopedComps.filter((c) => stateFromComponentStatus(c.status) !== "up").map((c) => c.name);
     verdict = SITE.copy.degraded.verdict;
-    subline = data.status.description || SITE.copy.degraded.subline;
+    subline = affected.length
+      ? `Some Codex components are degraded: ${affected.join(", ")}.`
+      : data.status.description || SITE.copy.degraded.subline;
   } else {
-    state = "down";
+    const affected = scopedComps.filter((c) => stateFromComponentStatus(c.status) !== "up").map((c) => c.name);
     verdict = SITE.copy.down.verdict;
-    subline = data.status.description || SITE.copy.down.subline;
+    subline = affected.length
+      ? `Codex components reporting issues: ${affected.join(", ")}.`
+      : data.status.description || SITE.copy.down.subline;
   }
 
   els.body.dataset.state = state;
@@ -60,30 +98,22 @@ function render(data) {
   if (els.smashImg && els.smashImg.getAttribute("src") !== BUTTONS[state]) {
     els.smashImg.src = BUTTONS[state];
   }
-  // feed status + severity to the panic counter (drives calm vs outage scaling)
+
   counter.setStatus(state, data);
 
-  // Component breakdown
   els.components.innerHTML = "";
-  let comps = (data.components || []).filter((c) => !c.group); // skip group containers
-  // Optional per-site trimming (config.js → SITE.components) for vendors that list
-  // dozens of components (config.js → SITE.components trims via an allowlist).
-  const compCfg = SITE.components || {};
-  if (Array.isArray(compCfg.include) && compCfg.include.length) {
-    const want = compCfg.include.map((s) => s.toLowerCase());
-    comps = comps.filter((c) => want.includes((c.name || "").toLowerCase()));
-  }
+  let comps = scopedComps;
   if (compCfg.limit > 0) comps = comps.slice(0, compCfg.limit);
   comps.forEach((c) => {
-      const li = document.createElement("li");
-      const name = document.createElement("span");
-      name.textContent = c.name;
-      const pill = document.createElement("span");
-      pill.className = "pill " + c.status;
-      pill.textContent = (c.status || "unknown").replace(/_/g, " ");
-      li.append(name, pill);
-      els.components.appendChild(li);
-    });
+    const li = document.createElement("li");
+    const name = document.createElement("span");
+    name.textContent = c.name;
+    const pill = document.createElement("span");
+    pill.className = "pill " + c.status;
+    pill.textContent = (c.status || "unknown").replace(/_/g, " ");
+    li.append(name, pill);
+    els.components.appendChild(li);
+  });
 
   els.updated.textContent = new Date().toLocaleTimeString();
 }
@@ -94,7 +124,6 @@ async function checkStatus() {
     if (!res.ok) throw new Error("bad response " + res.status);
     render(await res.json());
   } catch (err) {
-    // If the official page is itself unreachable, that's usually... a sign.
     els.body.dataset.state = "down";
     els.verdict.textContent = "?";
     els.subline.textContent = SITE.copy.unreachable;
@@ -107,78 +136,67 @@ const quotes = SITE.quotes;
 
 // ---------- PANIC COUNTER (split-flap odometer) ----------
 // Fully faked for now (no backend). Represents "panic-checks in the last 24h".
-//   • Calm days: a LOW number (0–5000) that resets at UTC midnight and creeps
-//     up slowly through the day.
-//   • Outages: a MUCH higher number, scaled by how long the outage has lasted
-//     (using the incident start time from the status API), climbing fast.
-// The number never drops mid-day (those checks already happened); it only
-// resets at UTC midnight. Swap in a real API later via counter.bump().
+// - Calm days: a LOW number (0-5000) that resets at UTC midnight and creeps
+//   up slowly through the day.
+// - Outages: a MUCH higher number, scaled by how long the outage has lasted,
+//   climbing fast.
+// The number never drops mid-day; it only resets at UTC midnight.
 
-const CLICK_RATE = {        // extra per-second jitter (only applied during issues)
+const CLICK_RATE = {
   up: 0,
   degraded: 1.2,
   down: 4.5,
 };
 
-// per-day deterministic pseudo-random in [0,1) — stable for the whole UTC day
 function daySeed() {
   const d = new Date();
   const n = d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
   const x = Math.sin(n) * 43758.5453;
   return x - Math.floor(x);
 }
+
 function utcDayStart() {
   const d = new Date();
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 }
+
 function dayKey() {
   const d = new Date();
   return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;
 }
 
-// Split-flap renderer: one .cell per character, flips only the digits that change.
 const counter = (() => {
-  let value = 0;            // the target value
-  let shown = 0;            // what's displayed (eases toward value)
-  let bonus = 0;            // user smashes, folded in each second
+  let value = 0;
+  let shown = 0;
+  let bonus = 0;
   let state = "up";
-  let data = null;          // latest status payload (for outage timing)
   let curDay = dayKey();
   let outageSeenAt = Number(localStorage.getItem("outageSeenAt")) || 0;
   let lastChars = [];
 
-  // calm baseline: 0 → (2500–5000) across the UTC day, random per day
   function calmBase(now) {
-    const target = 2500 + Math.floor(daySeed() * 2500); // 2500–5000
+    const target = 2500 + Math.floor(daySeed() * 2500);
     const frac = Math.min(1, (now - utcDayStart()) / 86400000);
     return Math.floor(target * frac);
   }
 
-  // outage contribution: 0 when up; otherwise scales with outage duration
   function outageBase(now) {
-    const ind = data?.status?.indicator || "none";
+    const ind = state === "down" ? "major" : state === "degraded" ? "minor" : "none";
     if (ind === "none") {
       outageSeenAt = 0;
       localStorage.removeItem("outageSeenAt");
       return 0;
     }
-    const severe = ind !== "minor"; // major / critical
-    // earliest active incident start from the API, else first time WE saw it
-    let start = null;
-    (data?.incidents || []).forEach((inc) => {
-      const t = Date.parse(inc.started_at || inc.created_at || "");
-      if (!isNaN(t)) start = start === null ? t : Math.min(start, t);
-    });
-    if (!start) {
-      if (!outageSeenAt) {
-        outageSeenAt = now;
-        localStorage.setItem("outageSeenAt", String(now));
-      }
-      start = outageSeenAt;
+
+    if (!outageSeenAt) {
+      outageSeenAt = now;
+      localStorage.setItem("outageSeenAt", String(now));
     }
-    const minutes = Math.max(0, (now - start) / 60000);
-    const perMin = severe ? 320 : 80;   // panic-checks per minute
-    const jump = severe ? 4000 : 1200;  // instant spike the moment it's detected
+
+    const severe = ind !== "minor";
+    const minutes = Math.max(0, (now - outageSeenAt) / 60000);
+    const perMin = severe ? 320 : 80;
+    const jump = severe ? 4000 : 1200;
     const wobble = 0.85 + daySeed() * 0.4;
     return Math.floor((jump + minutes * perMin) * wobble);
   }
@@ -191,7 +209,6 @@ const counter = (() => {
     const str = Math.floor(n).toLocaleString("en-US");
     const chars = str.split("");
 
-    // rebuild the cell structure if the length changed
     if (chars.length !== lastChars.length) {
       els.count.innerHTML = "";
       chars.forEach((ch) => {
@@ -204,21 +221,19 @@ const counter = (() => {
       return;
     }
 
-    // flip only the cells whose character changed
     const cells = els.count.children;
     chars.forEach((ch, i) => {
       if (lastChars[i] !== ch) {
         const cell = cells[i];
         cell.classList.remove("flipping");
-        void cell.offsetWidth; // restart animation
+        void cell.offsetWidth;
         cell.classList.add("flipping");
-        setTimeout(() => { cell.textContent = ch; }, 120); // swap mid-flip
+        setTimeout(() => { cell.textContent = ch; }, 120);
       }
     });
     lastChars = chars;
   }
 
-  // ease the displayed number toward the target (rolls up big jumps, snaps down)
   function ease() {
     if (shown === value) return;
     const diff = value - shown;
@@ -227,44 +242,40 @@ const counter = (() => {
   }
   setInterval(ease, 90);
 
-  // once a second: recompute floor, fold in smashes + outage jitter, daily reset
   setInterval(() => {
     const now = Date.now();
-    if (dayKey() !== curDay) {        // UTC midnight → reset to a fresh low base
+    if (dayKey() !== curDay) {
       curDay = dayKey();
       value = calmBase(now);
       shown = value;
       paint(shown);
     }
     const floor = floorNow(now);
-    if (floor > value) value = floor;  // never below the time/outage floor
+    if (floor > value) value = floor;
     const rate = CLICK_RATE[state] || 0;
-    if (rate > 0) {                    // frantic jitter only during issues
+    if (rate > 0) {
       value += Math.random() < (rate % 1) ? Math.ceil(rate) : Math.floor(rate);
     }
     value += bonus;
     bonus = 0;
   }, 1000);
 
-  // start straight at the right number (high if we load mid-outage)
   value = shown = calmBase(Date.now());
   paint(shown);
 
   return {
-    setStatus(s, d) { state = s; data = d; },
+    setStatus(s) { state = s; },
     bump(n = 1) { bonus += n; },
   };
 })();
 
 let lastQuote = -1;
 function smash() {
-  // never repeat the same quote twice in a row
   let i;
   do { i = Math.floor(Math.random() * quotes.length); } while (i === lastQuote);
   lastQuote = i;
 
   els.quote.classList.remove("show");
-  // force reflow so the fade re-triggers
   void els.quote.offsetWidth;
   els.quote.textContent = quotes[i];
   els.quote.classList.add("show");
@@ -273,15 +284,13 @@ function smash() {
   void els.smash.offsetWidth;
   els.smash.classList.add("pop");
 
-  counter.bump(1); // the user's own smash counts
-  checkStatus();   // every smash re-checks for real
+  counter.bump(1);
+  checkStatus();
 }
 
 els.smash.addEventListener("click", smash);
 
-// ---------- INIT ----------
 checkStatus();
-// auto-refresh every 30s while the tab is open
 setInterval(() => {
   if (!document.hidden) checkStatus();
 }, 30000);

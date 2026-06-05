@@ -1,40 +1,46 @@
-// ─────────────────────────────────────────────────────────────────────────
-// PER-SITE CONFIG — the only JS file you edit to fork this to another product.
+// ---------------------------------------------------------------------------
+// PER-SITE CONFIG - the only JS file you edit to fork this to another product.
 // Loaded before script.js. For the static HTML/asset swaps (title, FAQ, brand,
-// favicon, Stripe link, Brevo form), see FORK.md — those live in index.html.
-// ─────────────────────────────────────────────────────────────────────────
+// favicon, Stripe link, Brevo form), see FORK.md - those live in index.html.
+// ---------------------------------------------------------------------------
 window.SITE = {
-  // The product whose status we report (used only in copy below).
   product: "Codex",
 
-  // Status data source. MUST be a Statuspage v2 "summary.json" endpoint that
-  // sends CORS `Access-Control-Allow-Origin: *` (most public Statuspage sites do).
-  // Codex/OpenAI status feed:
+  // OpenAI public Statuspage feed.
   statusUrl: "https://status.openai.com/api/v2/summary.json",
 
-  // Verdict copy per state. For degraded/down, the live incident description from
-  // the API is used first; these strings are the fallback when none is provided.
   copy: {
-    up:          { verdict: "YES",   subline: "Codex is up. Back to work. 🫡" },
-    degraded:    { verdict: "KINDA", subline: "Some services are degraded." },
+    up:          { verdict: "YES",   subline: "Codex is up. Back to work." },
+    degraded:    { verdict: "KINDA", subline: "Some Codex components are degraded." },
     down:        { verdict: "NO",    subline: "Codex is having a rough time." },
     unreachable: "Can't even reach the status page. That's rarely a good sign.",
   },
 
-  // Service-breakdown list trimming. OpenAI exposes 25+ components; most are noise
-  // for this audience, so we keep an allowlist of the Codex-surface ones. Names below
-  // are matched (case-insensitive, exact) against the live feed at status.openai.com.
-  //   include: exact component names to keep (case-insensitive). [] = show all.
-  //   limit:   max rows after filtering. 0 = no limit.
-  components: { include: ["Codex API", "CLI", "VS Code extension", "Login", "Realtime"], limit: 8 },
+  // OpenAI exposes many services. This site's YES/NO verdict should be based only
+  // on Codex-relevant components, not the global OpenAI status indicator.
+  components: {
+    statusSource: "components",
+    include: ["Codex API", "CLI", "VS Code extension", "Login", "Realtime"],
+    limit: 8,
+  },
 
-  // Mascot + button art per state. Swap the files in /assets, keep the keys.
-  robots:  { up: "assets/codex-status-up-online-green-transparent.webp", degraded: "assets/codex-status-unknown-yellow-transparent.webp", down: "assets/codex-status-down-offline-red-transparent.webp" },
-  buttons: { up: "assets/codex-button-green-transparent.webp", down: "assets/codex-button-red-transparent.webp", default: "assets/codex-button-yellow-transparent.webp" },
+  robots:  {
+    up: "assets/codex-status-up-online-green-transparent.webp",
+    degraded: "assets/codex-status-unknown-yellow-transparent.webp",
+    down: "assets/codex-status-down-offline-red-transparent.webp",
+  },
+  buttons: {
+    up: "assets/codex-button-green-transparent.webp",
+    down: "assets/codex-button-red-transparent.webp",
+    default: "assets/codex-button-yellow-transparent.webp",
+  },
 
-  // Panic-counter one-liners. Keep them in-character for the product's audience.
-  // On iscodexup, Claude becomes the punchline when Codex is the one that's down.
   quotes: [
+    "Codex is down? Can't wait for a free usage reset from Tibo.",
+    "Codex, solve downtime issues, make no mistakes.",
+    "Codex needs to return before my boss notices my productivity is at zero.",
+    "I'm actually considering Cursor. What have I become?",
+    "I was close to breaking a world record prompt run. Now I need another billion tokens.",
     "My assignment is due tomorrow and I just started.",
     "If Codex goes down, so does my productivity.",
     "I forgot how to code without it.",
@@ -47,7 +53,7 @@ window.SITE = {
     "I will touch grass the moment it's back. Not before.",
     "Have you tried turning the AI off and on again?",
     "This is the longest 4 minutes of my life.",
-    "I'm thinking of using Antigravit— haha, no one uses that.",
+    "I'm thinking of using Antigravity. Look what you made me do.",
     "What's the URL for Claude again?",
     "Does this mean we get another usage reset?",
     "Guess I'll go open Cursor. Ugh.",
@@ -55,5 +61,81 @@ window.SITE = {
     "I'd ask Claude but I have my dignity.",
     "Is it down for everyone or just me being punished?",
     "My rate limit reset 3 minutes ago and now THIS.",
+    "Codex needs to come back before my boss notices I am just rearranging tabs.",
+    "I was one prompt away from shipping. That prompt was doing a lot of work.",
+    "The outage began exactly when I typed 'one last thing'. Suspicious.",
+    "I am about to read the documentation myself. Nobody wants that.",
+    "This is not downtime. This is forced independent thinking.",
+    "My productivity graph is now just a cliff with Wi-Fi.",
+    "I asked for a quick fix, not a character-building exercise.",
+    "I have reached the bargaining stage of prompt dependency.",
+    "Somewhere, a usage reset timer is laughing at me.",
+    "If this counts against my limit, I am writing a strongly worded prompt.",
+    "I did not budget emotionally for manual reasoning today.",
+    "The fallback plan was 'ask Codex again' and I stand by it.",
+    "Gemini is looking at me like it has been waiting for this moment.",
+    "Google, put the Antigravity down. This is already unstable.",
+    "I opened Gemini and immediately apologized to my workflow.",
+    "I considered Cursor for three seconds and need a shower.",
+    "Copilot just said 'we can try'. That is not the energy I need.",
+    "If Codex is down, my keyboard is basically decorative.",
+    "I am not procrastinating. I am monitoring critical infrastructure.",
+    "The incident report better include my lost vibe.",
+    "I can stop refreshing anytime. I simply choose not to.",
+    "The status page says operational, but my soul says degraded.",
+    "Codex is up? Great. I have forgotten what I was doing.",
+    "I was promised artificial intelligence, not artificial patience.",
+    "This is why I keep a backup AI and never respect it.",
+    "My prompt was too powerful. The servers needed a minute.",
+    "Codex went down and took my plausible deniability with it.",
+    "I am one outage away from naming variables myself.",
+    "If the next reset is free, I forgive everything.",
+    "I asked Codex to improve uptime and it scheduled a personal day.",
+    "This is the kind of downtime that makes a person install another CLI.",
+    "My TODO list just made eye contact with me.",
+    "I have become the human in the loop. Horrifying.",
+    "Codex is down and somehow my impostor syndrome is up.",
+    "Every refresh is a tiny incident response drill.",
+    "The only thing operational right now is my panic counter.",
+    "I am going to write code unaided, like a historical reenactment.",
+    "If anyone asks, I am doing resilience testing.",
+    "My vibe coding has become vibe waiting.",
+    "The vibes are not compiling.",
+    "I was vibe coding. Now I am just vibing incorrectly.",
+    "Codex is down and my roadmap just became folklore.",
+    "My sprint velocity is now measured in refreshes per minute.",
+    "I need Codex back before Jira develops opinions.",
+    "This outage has promoted me to senior prompt engineer of nothing.",
+    "I had a perfect prompt chain and now it is a cold case.",
+    "I asked for agentic coding, not agentic abandonment.",
+    "Claude is looking useful right now, which is how you know things are bad.",
+    "Claude Code, if you can hear me, pretend this never happened.",
+    "Do I open Claude or wait like a loyal fool?",
+    "Codex is down. Claude is typing 'new phone who dis'.",
+    "I would ask Claude, but I am emotionally unavailable.",
+    "If Claude is up, please do not tell my Codex workflow.",
+    "Gemini just sent a 'you up?' notification.",
+    "Google saw me open Antigravity and immediately filed an incident.",
+    "Antigravity sounds tempting until gravity comes back online.",
+    "Gemini can help, but can it judge my messy repo with kindness?",
+    "I am one outage away from becoming a multi-model household.",
+    "The usage reset better come with an apology basket.",
+    "If downtime burns tokens, I am invoicing the cloud.",
+    "My rate limit has recovered faster than I have.",
+    "Usage resets are just loot boxes for tired developers.",
+    "I hit the button again for science and emotional support.",
+    "This is not a bug. It is a productivity-denial service attack.",
+    "My boss thinks I am blocked by dependencies. Technically true.",
+    "The only dependency failing is me.",
+    "I just renamed a variable manually and felt something leave my body.",
+    "Stack Overflow opened and asked where I have been.",
+    "I am reading the error message myself. Dark times.",
+    "The AI is down, so now I have to be the intelligence.",
+    "My commit message is going to be 'fixed during outage, somehow'.",
+    "I trusted the agent with my flow state and it took PTO.",
+    "This button is cheaper than therapy and less effective.",
+    "Codex, blink twice if the context window ate the server.",
+    "Somewhere in a data center, my half-written regex is alone.",
+    "I am not saying Codex caused the outage, but I did ask it to refactor everything.",
   ],
 };
