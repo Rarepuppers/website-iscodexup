@@ -258,9 +258,11 @@
 
   <!-- Self-contained signup handler. We deliberately do NOT load Brevo's main.js:
        it can't parse our custom dark-theme consent field, which made it misreport
-       the email error and fall back to a native POST (blank-page redirect). This
-       validates inline and POSTs into a hidden iframe so the page never navigates;
-       the same POST still triggers Brevo's double-opt-in confirmation email. -->
+       the email error and fall back to a native POST. Instead we validate inline
+       (so we control the messages) and submit using Brevo's own AJAX transport:
+       XMLHttpRequest + FormData to `<action>?isAjax=1`. The ?isAjax=1 flag is what
+       makes Brevo actually process the signup and send the double-opt-in email —
+       a plain POST without it returns 200 but is silently ignored. -->
   <script>
     (function () {
       var form = document.getElementById('sib-form');
@@ -272,41 +274,37 @@
       var errorPanel = document.getElementById('error-message');
       var okPanel    = document.getElementById('success-message');
 
-      var MSG_EMAIL_REQUIRED  = "Can't email the void. Pop your email address in first.";
-      var MSG_EMAIL_INVALID   = "That email looks about as broken as Codex right now. Double-check the format and try again.";
+      var MSG_EMAIL_REQUIRED   = "Can't email the void. Pop your email address in first.";
+      var MSG_EMAIL_INVALID    = "That email looks about as broken as Codex right now. Double-check the format and try again.";
       var MSG_CONSENT_REQUIRED = "Please tick the box to proceed.";
       var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      // Hidden sink: the form POSTs into this iframe instead of navigating the page.
-      var sink = document.createElement('iframe');
-      sink.name = 'sib-sink';
-      sink.setAttribute('aria-hidden', 'true');
-      sink.style.display = 'none';
-      document.body.appendChild(sink);
-      form.setAttribute('target', 'sib-sink');
       form.setAttribute('novalidate', 'novalidate'); // we validate ourselves
 
       function setErr(el, msg) { if (el) { el.textContent = msg || ''; el.style.display = msg ? 'block' : 'none'; } }
       function hidePanels() { if (errorPanel) errorPanel.style.display = 'none'; if (okPanel) okPanel.style.display = 'none'; }
-
-      var pending = false;
+      function showSuccess() { hidePanels(); if (okPanel) { okPanel.style.display = 'block'; okPanel.scrollIntoView({ behavior: 'smooth', block: 'center' }); } form.reset(); }
+      function showError()   { hidePanels(); if (errorPanel) { errorPanel.style.display = 'block'; errorPanel.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
 
       form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
         setErr(emailErr, ''); setErr(consentErr, ''); hidePanels();
         var val = (email && email.value || '').trim();
-        if (!val)                 { ev.preventDefault(); setErr(emailErr, MSG_EMAIL_REQUIRED); email.focus(); return; }
-        if (!EMAIL_RE.test(val))  { ev.preventDefault(); setErr(emailErr, MSG_EMAIL_INVALID);  email.focus(); return; }
-        if (consent && !consent.checked) { ev.preventDefault(); setErr(consentErr, MSG_CONSENT_REQUIRED); consent.focus(); return; }
-        pending = true; // valid → allow the POST into the hidden iframe
-      });
+        if (!val)                        { setErr(emailErr, MSG_EMAIL_REQUIRED); email.focus(); return; }
+        if (!EMAIL_RE.test(val))         { setErr(emailErr, MSG_EMAIL_INVALID);  email.focus(); return; }
+        if (consent && !consent.checked) { setErr(consentErr, MSG_CONSENT_REQUIRED); consent.focus(); return; }
 
-      // The iframe fires 'load' once the POST completes (even cross-origin).
-      sink.addEventListener('load', function () {
-        if (!pending) return; // ignore the initial about:blank load
-        pending = false;
-        hidePanels();
-        if (okPanel) { okPanel.style.display = 'block'; okPanel.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-        form.reset();
+        // Submit exactly the way Brevo's own script does.
+        var data = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', function () {
+          var res = null; try { res = JSON.parse(xhr.response); } catch (e) {}
+          if (xhr.status >= 200 && xhr.status < 300 && !(res && res.errors)) showSuccess();
+          else showError();
+        });
+        xhr.addEventListener('error', showError);
+        xhr.open('POST', form.getAttribute('action') + '?isAjax=1');
+        xhr.send(data);
       });
     })();
   </script>
