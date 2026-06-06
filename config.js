@@ -172,5 +172,12 @@ window.SITE = {
     "Claude is my backup plan, and I hate that this is growth.",
     "Cursor just cleared its throat from the dock.",
     "I was one autonomous step away from blaming the agent.",
+    "Refreshing Tibo's timeline harder than I refresh this page.",
+    "Tibo, this is your sign to announce a usage reset.",
+    "My emotional support account is Tibo's Twitter.",
+    "Somewhere, Tibo is drafting the tweet that fixes my whole day.",
+    "I don't need a therapist, I need Tibo to tweet 'limits reset'.",
+    "Checking Tibo's mentions for hope like it's a status page.",
+    "Tibo posts a reset and suddenly I believe in something again.",
   ],
 };
