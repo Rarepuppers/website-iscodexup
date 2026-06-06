@@ -1,1 +1,4 @@
 .claude/settings.local.json
+
+# Wrangler local cache/state (Cloudflare Worker tooling)
+.wrangler/

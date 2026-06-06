@@ -155,6 +155,18 @@
                 </button>
               </div>
 
+              <!-- GDPR consent (required) — the Brevo list has consent enabled, so this
+                   field must be present and ticked. value="1" is what Brevo records. -->
+              <div class="sib-optin sib-form-block" data-required="true">
+                <div class="form__entry entry_mcq">
+                  <label class="consent-label">
+                    <input type="checkbox" value="1" id="GDPR_CONSENT" name="GDPR_CONSENT" required />
+                    <span class="consent-text">I agree to receive an email about Codex's status and accept the <a href="privacy.html">privacy policy</a>. Unsubscribe anytime.</span>
+                  </label>
+                  <label class="entry__error entry__error--primary"></label>
+                </div>
+              </div>
+
               <!-- honeypot + locale (keep these — Brevo needs them) -->
               <input type="text" name="email_address_check" value="" class="input--hidden" />
               <input type="hidden" name="locale" value="en" />

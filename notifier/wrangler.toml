@@ -8,11 +8,11 @@ compatibility_date = "2025-01-01"
 [triggers]
 crons = ["* * * * *"]
 
-# Create with: wrangler kv namespace create STATE
-# TODO(iscodexup): replace this with the new KV namespace id before deploying.
+# Created with: wrangler kv namespace create iscodexup_STATE  (title must be unique per
+# account — isclaudeup already owns "STATE"). Binding stays "STATE" (worker uses env.STATE).
 [[kv_namespaces]]
 binding = "STATE"
-id = "REPLACE_WITH_NEW_KV_NAMESPACE_ID"
+id = "78f8d0b3c68a45d895345cd79309500f"
 
 [vars]
 STATUS_URL = "https://status.openai.com/api/v2/summary.json"
@@ -20,8 +20,8 @@ STATUS_URL = "https://status.openai.com/api/v2/summary.json"
 # OpenAI exposes many services. Recovery email state is scoped to these components.
 COMPONENT_INCLUDE = "Codex API,CLI,VS Code extension,Login,Realtime"
 
-# TODO(iscodexup): set the numeric id of the new Codex notify list in Brevo.
-BREVO_LIST_ID = "REPLACE_WITH_CODEX_NOTIFY_LIST_ID"
+# Codex notify list (Brevo → Contacts → Lists → "iscodexup", id 10).
+BREVO_LIST_ID = "10"
 SENDER_NAME = "Is Codex Up"
 # TODO(iscodexup): authenticate iscodexup.com in Brevo before this sender works.
 SENDER_EMAIL = "notify@iscodexup.com"
