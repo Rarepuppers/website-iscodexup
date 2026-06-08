@@ -417,4 +417,5 @@ body[data-state="degraded"] .alternatives { display: block; }
 .foot p { margin: 6px 0; }
 .foot a { color: var(--fg); }
 .foot-main { font-size: 14px; color: var(--fg); }
+.foot-network { font-size: 12px; opacity: .78; }
 .foot-legal { font-size: 12px; opacity: .65; }
