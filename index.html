@@ -13,10 +13,90 @@
   <meta property="og:title" content="Is Codex Down Right Now?" />
   <meta property="og:description" content="Live OpenAI Codex status. Get notified the second it's back up." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://iscodexup.com" />
+  <meta property="og:url" content="https://iscodexup.com/" />
+  <meta property="og:site_name" content="Is Codex Up" />
+  <meta property="og:image" content="https://iscodexup.com/assets/favicon.png" />
+  <meta property="og:image:alt" content="Is Codex Up status logo." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Is Codex Down Right Now?" />
+  <meta name="twitter:description" content="Live OpenAI Codex status. Get notified the second it's back up." />
+  <meta name="twitter:image" content="https://iscodexup.com/assets/favicon.png" />
+  <meta name="theme-color" content="#0f1115" />
 
   <link rel="canonical" href="https://iscodexup.com/" />
   <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Is Codex Up",
+    "alternateName": "Is Codex Down?",
+    "url": "https://iscodexup.com/",
+    "description": "Live status of OpenAI Codex, pulled from OpenAI's official status feed, with email alerts the moment Codex recovers.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "SnackPack Universe",
+      "url": "https://www.snackpackuniverse.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Codex down right now?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This page checks OpenAI's official status feed live when it loads, and again every 30 seconds. If the big answer reads NO, Codex is reporting problems; YES means all systems are operational."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is it Codex that's down, or my internet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Quick checks: load another website to rule out your connection, try Codex in an incognito window or on a different network, and clear your cache. If this page shows Codex as up but it still fails for you, the problem is likely local — your network, a browser extension, or your account."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the difference between Codex and the OpenAI API being down?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Codex is OpenAI's coding agent (in the CLI, IDE extensions, and the cloud), while the OpenAI API and ChatGPT are separate components. They can fail independently — the API can be degraded while ChatGPT is fine, or vice versa. The service breakdown shows each component separately."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where does this site get its status data?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Straight from OpenAI's official status page at status.openai.com — the same source OpenAI publishes. We don't run our own probes or guess, so what you see here matches the official report."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Will you email me when Codex is back up?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — that's the whole point. Pop your email in the signup box and we'll send a single message the moment Codex recovers, so you can get straight back to work."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often does Codex go down?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Like any large online service, Codex is up the vast majority of the time but has the occasional incident — usually brief, and sometimes affecting only one component (a single model, or just the API). For the official history of past incidents, see status.openai.com."
+        }
+      }
+    ]
+  }
+  </script>
 
   <!-- Preload the "up" robot + default button so the first paint is instant during a spike -->
   <link rel="preload" as="image" href="assets/codex-status-up-online-green-transparent.webp" />

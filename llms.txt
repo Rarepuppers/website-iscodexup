@@ -1,0 +1,16 @@
+# Is Codex Up
+
+> iscodexup.com answers one question: is OpenAI Codex down right now? It reads OpenAI's official status feed (status.openai.com) live — covering Codex, the OpenAI API, and ChatGPT components — and shows a plain YES/NO verdict with a per-component service breakdown. Free email alerts notify subscribers the moment Codex recovers from an outage.
+
+Key facts: status data comes straight from OpenAI's official status page, refreshed every 30 seconds — no independent probes or guesses. The site is an independent status helper built by SnackPack Universe and is not affiliated with, endorsed by, or sponsored by OpenAI. No account is needed; the only data collected is an email address voluntarily submitted for back-up alerts.
+
+## Pages
+
+- [Home / live status](https://iscodexup.com/): The live YES/NO verdict, per-component breakdown, recovery email signup, and a Codex outage FAQ.
+- [Privacy policy](https://iscodexup.com/privacy.html): What's collected (an email address, if submitted) and the third parties involved.
+- [Sponsor](https://iscodexup.com/sponsor.html): Sponsorship options for reaching developers during Codex outages.
+
+## Related
+
+- [Is Claude Up](https://isclaudeup.com/): Sister site answering the same question for Anthropic's Claude.
+- [SnackPack Universe](https://www.snackpackuniverse.com/): The studio behind this site.
