@@ -31,6 +31,14 @@
   <!-- Vector fallback (black/white PNG above is the primary, matching OpenAI's look).
        To switch to the lime infinity, add: <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" /> ABOVE the PNG. -->
 
+  <!-- PWA: installable on Windows (Edge/Chrome) and Android home screen -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IsCodexUp" />
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -421,5 +429,12 @@
   <!-- Cloudflare Web Analytics — privacy-friendly, cookieless (no consent banner needed) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon='{"token": "cd86c3d12ce84ba78d722eaa217163dc"}'></script>
+
+  <!-- PWA: register the service worker so the site is installable / works offline -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    }
+  </script>
 </body>
 </html>
