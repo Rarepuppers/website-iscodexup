@@ -74,7 +74,10 @@ function render(data) {
 
   if (state === "up") {
     verdict = SITE.copy.up.verdict;
-    subline = SITE.copy.up.subline;
+    const ups = SITE.copy.up.sublines;
+    subline = ups && ups.length
+      ? ups[Math.floor(Math.random() * ups.length)]
+      : SITE.copy.up.subline;
   } else if (state === "degraded") {
     const affected = scopedComps.filter((c) => stateFromComponentStatus(c.status) !== "up").map((c) => c.name);
     verdict = SITE.copy.degraded.verdict;
