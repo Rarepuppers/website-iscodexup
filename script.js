@@ -64,6 +64,15 @@ function stateFromPageIndicator(indicator) {
   return "down";
 }
 
+// Pick a random subline from a copy state's `sublines` array, falling back to its
+// single `subline` string. Used for up/degraded/down so every verdict gets variety.
+function pickSubline(copyState) {
+  const arr = copyState && copyState.sublines;
+  return arr && arr.length
+    ? arr[Math.floor(Math.random() * arr.length)]
+    : (copyState && copyState.subline) || "";
+}
+
 function render(data) {
   const pageIndicator = data?.status?.indicator || "none";
   const compCfg = SITE.components || {};
@@ -74,22 +83,19 @@ function render(data) {
 
   if (state === "up") {
     verdict = SITE.copy.up.verdict;
-    const ups = SITE.copy.up.sublines;
-    subline = ups && ups.length
-      ? ups[Math.floor(Math.random() * ups.length)]
-      : SITE.copy.up.subline;
+    subline = pickSubline(SITE.copy.up);
   } else if (state === "degraded") {
     const affected = scopedComps.filter((c) => stateFromComponentStatus(c.status) !== "up").map((c) => c.name);
     verdict = SITE.copy.degraded.verdict;
     subline = affected.length
       ? `Some Codex components are degraded: ${affected.join(", ")}.`
-      : data.status.description || SITE.copy.degraded.subline;
+      : data.status.description || pickSubline(SITE.copy.degraded);
   } else {
     const affected = scopedComps.filter((c) => stateFromComponentStatus(c.status) !== "up").map((c) => c.name);
     verdict = SITE.copy.down.verdict;
     subline = affected.length
       ? `Codex components reporting issues: ${affected.join(", ")}.`
-      : data.status.description || SITE.copy.down.subline;
+      : data.status.description || pickSubline(SITE.copy.down);
   }
 
   els.body.dataset.state = state;
