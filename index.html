@@ -106,6 +106,22 @@
           "@type": "Answer",
           "text": "Like any large online service, Codex is up the vast majority of the time but has the occasional incident — usually brief, and sometimes affecting only one component (a single model, or just the API). For the official history of past incidents, see status.openai.com."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the Codex CLI down?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Codex coding agent (CLI, IDE extension, and cloud) is tracked in the service breakdown above. It can be down even when ChatGPT and the OpenAI API are fine, so check that specific component. If this page shows Codex as operational but it still fails for you, the issue is likely local — your CLI version, network, or auth token."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the OpenAI Codex API status right now?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The OpenAI API is shown as its own line in the service breakdown above, pulled live from OpenAI's official status feed. The API can be degraded independently of ChatGPT or the Codex agent, which is why developers often see Codex failures while ChatGPT works fine."
+        }
       }
     ]
   }
@@ -322,6 +338,16 @@
       <details>
         <summary>How often does Codex go down?</summary>
         <p>Like any large online service, Codex is up the vast majority of the time but has the occasional incident — usually brief, and sometimes affecting only one component (a single model, or just the API). For the official history of past incidents, see status.openai.com.</p>
+      </details>
+
+      <details>
+        <summary>Is the Codex CLI down?</summary>
+        <p>The Codex coding agent — CLI, IDE extension, and cloud — is tracked in the service breakdown above. It can be down even when ChatGPT and the OpenAI API are fine, so check that specific component. If this page shows Codex as operational but it still fails for you, the issue is likely local — your CLI version, network, or auth token.</p>
+      </details>
+
+      <details>
+        <summary>What's the OpenAI Codex API status right now?</summary>
+        <p>The OpenAI API is shown as its own line in the service breakdown above, pulled live from OpenAI's official status feed. The API can be degraded independently of ChatGPT or the Codex agent, which is why developers often see Codex failures while ChatGPT works fine.</p>
       </details>
     </section>
 
