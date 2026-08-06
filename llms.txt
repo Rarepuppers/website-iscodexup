@@ -7,6 +7,7 @@ Key facts: status data comes straight from OpenAI's official status page, refres
 ## Pages
 
 - [Home / live status](https://iscodexup.com/): The live YES/NO verdict, per-component breakdown, recovery email signup, and a Codex outage FAQ.
+- [Codex outage history](https://iscodexup.com/history.html): How often Codex goes down and for how long — incident counts for the last 30 and 90 days, median and longest incident length, and every recent incident with its official report link, all computed live from OpenAI's incidents feed.
 - [Privacy policy](https://iscodexup.com/privacy.html): What's collected (an email address, if submitted) and the third parties involved.
 - [Sponsor](https://iscodexup.com/sponsor.html): Sponsorship options for reaching developers during Codex outages.
 

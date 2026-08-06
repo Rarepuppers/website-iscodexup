@@ -55,6 +55,8 @@ Edit `config.js` -> `window.SITE`:
     fetch("https://status.openai.com/api/v2/summary.json").then(r => r.json()).then(console.log)
     ```
 
+- `vendor`: who runs the status page, e.g. `"OpenAI"`. Used when a vendor-wide
+  incident doesn't touch any scoped component.
 - `copy.up/degraded/down/unreachable`: product-specific verdict copy.
 - `quotes[]`: panic-button one-liners in the new product's voice.
 - `components`: optional service trimming. For OpenAI/Codex, use a component
@@ -64,11 +66,55 @@ Edit `config.js` -> `window.SITE`:
 For OpenAI/Codex, the page verdict should be based on Codex-related components,
 not OpenAI's global status indicator.
 
+### The component allowlist is the most fragile thing in this file
+
+`components.include` entries must match the vendor's **published component names
+exactly** (case-insensitive), and vendors rename and retire components without
+notice. This has already bitten us once: `iscodexup` shipped
+`["Codex API", "CLI", "VS Code extension", "Login", "Realtime"]`, of which only
+`Login` and `Realtime` existed. For months the Codex verdict was computed without
+looking at a single Codex component, and the same stale list in
+`notifier/wrangler.toml` meant a real Codex outage could never fire a recovery email.
+
+Before editing, dump the live names:
+
+```bash
+curl -s https://status.openai.com/api/v2/summary.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>JSON.parse(s).components.forEach(c=>console.log(c.name)))"
+```
+
+`script.js` now falls back to the full component list and logs a console warning
+when the allowlist matches nothing, and the worker logs every missing name — check
+the browser console and `wrangler tail` after any change here.
+
+## 1b. Shared JS: keep the copies in sync
+
+`config.js` is per-site, but `script.js` and `history.js` are **shared code that
+must stay byte-identical across sites**. They previously drifted, and the stale
+copy on `iscodexup` was the one carrying the broken component logic above.
+
+After changing either file, copy it to the sibling repo in the same commit:
+
+```bash
+cp website-isclaudeup/script.js  website-iscodexup/script.js
+cp website-isclaudeup/history.js website-iscodexup/history.js
+```
+
+Anything genuinely per-site belongs in `config.js`, never in a local edit to
+`script.js`.
+
+## 1c. Bump the service worker cache on every code deploy
+
+`sw.js` has a `CACHE` constant (`isclaudeup-shell-vN`). Increment it whenever
+`script.js`, `history.js`, `config.js`, or the markup changes. Code and markup are
+served network-first so a fix lands even without a bump, but the version bump is
+what evicts the old cached copies for good.
+
 ## 2. Static Swaps
 
 Search and replace the product/vendor/domain copy in:
 
 - `index.html`
+- `history.html`
 - `privacy.html`
 - `sponsor.html`
 - `CNAME`

@@ -6,7 +6,8 @@
   <!-- FORKING THIS TO ANOTHER PRODUCT (e.g. iscodexup.com)? Runtime values live in
        config.js; the static HTML swaps below are all listed in FORK.md. -->
 
-  <title>Is Codex Down? — Live OpenAI Codex Status</title>
+  <!-- "right now" is in the actual query people type ("is codex down right now"), so keep it in the title. -->
+  <title>Is Codex Down Right Now? — Live OpenAI Codex Status</title>
   <meta name="description" content="Live status of OpenAI Codex. Find out instantly if Codex is down right now, and get an email the second it comes back up." />
 
   <!-- Google Search Console verification -->
@@ -18,12 +19,17 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://iscodexup.com/" />
   <meta property="og:site_name" content="Is Codex Up" />
-  <meta property="og:image" content="https://iscodexup.com/assets/favicon.png" />
-  <meta property="og:image:alt" content="Is Codex Up status logo." />
-  <meta name="twitter:card" content="summary" />
+  <!-- 1200x630 card. This is the growth loop: people paste this link into Slack/X mid-outage,
+       and a large card gets clicked far more than the old favicon-sized `summary` thumbnail. -->
+  <meta property="og:image" content="https://iscodexup.com/assets/og-card.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Is Codex down right now? Live OpenAI Codex status." />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Is Codex Down Right Now?" />
   <meta name="twitter:description" content="Live OpenAI Codex status. Get notified the second it's back up." />
-  <meta name="twitter:image" content="https://iscodexup.com/assets/favicon.png" />
+  <meta name="twitter:image" content="https://iscodexup.com/assets/og-card.png" />
+  <meta name="twitter:image:alt" content="Is Codex down right now? Live OpenAI Codex status." />
   <meta name="theme-color" content="#0f1115" />
 
   <link rel="canonical" href="https://iscodexup.com/" />
@@ -47,6 +53,25 @@
     "alternateName": "Is Codex Down?",
     "url": "https://iscodexup.com/",
     "description": "Live status of OpenAI Codex, pulled from OpenAI's official status feed, with email alerts the moment Codex recovers.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "SnackPack Universe",
+      "url": "https://www.snackpackuniverse.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Is Codex Up",
+    "url": "https://iscodexup.com/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript.",
+    "description": "A live OpenAI Codex status checker: reads OpenAI's official status feed every 30 seconds and shows a plain YES/NO answer, with optional email alerts when Codex recovers from an outage.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "isAccessibleForFree": true,
     "publisher": {
       "@type": "Organization",
       "name": "SnackPack Universe",
@@ -170,6 +195,19 @@
         <span id="count" class="odometer" aria-label="panic checks in the last 24 hours"></span>
         panic-checks in the last 24h
       </p>
+
+      <!-- The link gets pasted into Slack/X during outages — that's basically all our
+           organic reach. Make it one tap. Native share sheet on mobile, clipboard elsewhere. -->
+      <button class="share" id="share" type="button" aria-label="Share this page">
+        <span class="share-icon" aria-hidden="true">🔗</span>
+        <span class="share-label">Share this page</span>
+      </button>
+
+      <!-- Sister site. The .alternatives block below is hidden while Codex is up, so
+           without this line the cross-link only exists in the footer on a calm day. -->
+      <p class="sister">
+        Using Claude too? <a href="https://isclaudeup.com/">Check Claude status &rarr;</a>
+      </p>
     </section>
 
     <!-- CONTEXTUAL BACKUP TOOLS — only shown during an outage (CSS toggles on data-state) -->
@@ -177,7 +215,10 @@
       <h2>Stuck while Codex is down?</h2>
       <p>Keep moving with one of these until it's back — we'll still email you the second it recovers.</p>
       <ul class="alt-list">
-        <li><a href="https://claude.com/claude-code" target="_blank" rel="sponsored noopener">Claude Code</a> <span>agentic coding CLI</span></li>
+        <!-- Points at our own sister site's status check rather than straight to Anthropic:
+             if someone is bailing out of Codex anyway, they should at least find out whether
+             the alternative is up before they switch. isclaudeup mirrors this with Codex. -->
+        <li><a href="https://isclaudeup.com/" target="_blank" rel="noopener">Claude Code</a> <span>agentic coding CLI — check it's up first</span></li>
         <li><a href="https://cursor.com" target="_blank" rel="sponsored noopener">Cursor</a> <span>AI code editor</span></li>
         <li><a href="https://github.com/features/copilot" target="_blank" rel="sponsored noopener">GitHub Copilot</a> <span>in-IDE autocomplete</span></li>
         <li><a href="https://windsurf.com" target="_blank" rel="sponsored noopener">Windsurf</a> <span>agentic IDE</span></li>
@@ -337,7 +378,7 @@
 
       <details>
         <summary>How often does Codex go down?</summary>
-        <p>Like any large online service, Codex is up the vast majority of the time but has the occasional incident — usually brief, and sometimes affecting only one component (a single model, or just the API). For the official history of past incidents, see status.openai.com.</p>
+        <p>Like any large online service, Codex is up the vast majority of the time but has the occasional incident — usually brief, and sometimes affecting only one component (a single surface, or just the API). We keep a running <a href="history.html">Codex outage history</a> with the incident count for the last 30 and 90 days and how long each one lasted, straight from OpenAI's feed.</p>
       </details>
 
       <details>
@@ -362,6 +403,9 @@
         This is an independent status helper. It is not affiliated with, endorsed by,
         or sponsored by OpenAI. Codex and OpenAI are trademarks of OpenAI.
         Last checked <span id="updated">—</span>.
+      </p>
+      <p class="foot-network">
+        <a href="history.html">Codex outage history</a> — how often it goes down, and for how long.
       </p>
       <p class="foot-network">
         Also checking Anthropic? <a href="https://isclaudeup.com/" target="_blank" rel="noopener">Visit isclaudeup.com</a>.

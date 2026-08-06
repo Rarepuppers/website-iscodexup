@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Codex Outage History — How Often Does OpenAI Codex Go Down?</title>
+  <meta name="description" content="Every recent OpenAI Codex incident, pulled live from OpenAI's official status feed: how often Codex goes down, how long outages last, and what broke." />
+
+  <meta name="google-site-verification" content="Lxzfrx0EL1IodufKyAHGFtsM9GTX8xIWuCULzhhZbxY" />
+
+  <meta property="og:title" content="Codex Outage History" />
+  <meta property="og:description" content="How often does OpenAI Codex actually go down? Every recent incident, straight from OpenAI's official status feed." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://iscodexup.com/history.html" />
+  <meta property="og:site_name" content="Is Codex Up" />
+  <meta property="og:image" content="https://iscodexup.com/assets/og-card.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Is Codex down right now? Live OpenAI Codex status." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Codex Outage History" />
+  <meta name="twitter:description" content="How often does OpenAI Codex actually go down? Every recent incident, straight from OpenAI's official status feed." />
+  <meta name="twitter:image" content="https://iscodexup.com/assets/og-card.png" />
+  <meta name="theme-color" content="#0f1115" />
+
+  <link rel="canonical" href="https://iscodexup.com/history.html" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Is Codex Up", "item": "https://iscodexup.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Codex outage history", "item": "https://iscodexup.com/history.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How often does OpenAI Codex go down?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This page counts every Codex-related incident in OpenAI's official status feed, reports the span that feed actually covers, and shows the average incidents per week plus the median and longest incident length. Most incidents are brief and affect a single component rather than all of OpenAI at once."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long do Codex outages usually last?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The median incident length is shown at the top of this page, calculated from each incident's official start and resolution timestamps. Minor degradations are typically resolved far faster than major outages."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where does this outage history come from?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Every entry is OpenAI's own published incident record from status.openai.com, read live via its public API. We don't run independent probes, so nothing here is our estimate — it is the vendor's own report."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-state="up" class="page-history">
+  <main class="wrap">
+    <header class="topbar">
+      <a class="brand" href="/">iscodexup<span class="dot">.com</span></a>
+    </header>
+
+    <section class="history-intro">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Live status</a> <span aria-hidden="true">/</span> <span>Outage history</span>
+      </nav>
+
+      <h1>Codex outage history</h1>
+      <p class="history-lede">
+        How often does OpenAI Codex actually go down, and for how long? Every incident below is
+        OpenAI's own published record, read live from
+        <a href="https://status.openai.com" target="_blank" rel="noopener">status.openai.com</a>
+        — not our estimate.
+      </p>
+      <p class="history-scope" id="scope-note"></p>
+
+      <p class="history-cta">
+        Checking because something's broken right now?
+        <a href="/">See the live verdict &rarr;</a>
+      </p>
+    </section>
+
+    <section class="history-stats" aria-label="Incident summary">
+      <ul id="stats" class="stat-grid"></ul>
+      <p class="history-coverage" id="coverage-note"></p>
+    </section>
+
+    <section class="history-list">
+      <h2>Recent incidents</h2>
+      <div id="incident-list"></div>
+      <p id="incident-empty" class="history-empty" hidden>
+        No incidents published in the window covered by OpenAI's feed. Quiet spell.
+      </p>
+    </section>
+
+    <section class="faq">
+      <h2>About this data</h2>
+
+      <details>
+        <summary>How often does Codex go down?</summary>
+        <p>The counters above tally every Codex-related incident in OpenAI's official status feed and show the average per week. OpenAI publishes only its 50 most recent incidents, so the span covered is stated under the numbers, and during a busy stretch that can be a matter of weeks rather than months. Most incidents are brief and affect a single component — a specific surface, or just the API — rather than all of OpenAI at once.</p>
+      </details>
+
+      <details>
+        <summary>How long do Codex outages usually last?</summary>
+        <p>The median figure above is calculated from each incident's official start and resolution timestamps. Minor degradations resolve much faster than major outages, so the median is usually well below the longest incident in the window.</p>
+      </details>
+
+      <details>
+        <summary>Where does this come from?</summary>
+        <p>OpenAI's own incident record at status.openai.com, read live via its public API. We don't run independent probes, so nothing here is a guess on our part. Each entry links to the official incident report.</p>
+      </details>
+
+      <details>
+        <summary>Why might this differ from what I experienced?</summary>
+        <p>A status page only lists incidents the vendor has declared. Short blips, regional problems, and account-specific failures often never get an incident record, so your bad afternoon may not appear here at all.</p>
+      </details>
+    </section>
+
+    <footer class="foot">
+      <p class="foot-main">
+        © 2026 Is Codex Up — built by
+        <a href="https://www.snackpackuniverse.com/">Snackpack Universe</a>.
+      </p>
+      <p>
+        Incident history pulled live from the official
+        <a href="https://status.openai.com" target="_blank" rel="noopener">status.openai.com</a>.
+        This is an independent status helper. It is not affiliated with, endorsed by,
+        or sponsored by OpenAI. Codex and OpenAI are trademarks of OpenAI.
+        Last loaded <span id="updated">—</span>.
+      </p>
+      <p class="foot-network">
+        Also checking Anthropic? <a href="https://isclaudeup.com/" target="_blank" rel="noopener">Visit isclaudeup.com</a>.
+      </p>
+      <p class="foot-legal">
+        Snackpack Universe · ABN 51 918 351 341 ·
+        <a href="privacy.html">Privacy</a> ·
+        <a href="sponsor.html">Sponsor</a>
+      </p>
+    </footer>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="history.js"></script>
+
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "cd86c3d12ce84ba78d722eaa217163dc"}'></script>
+</body>
+</html>

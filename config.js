@@ -5,6 +5,9 @@
 // ---------------------------------------------------------------------------
 window.SITE = {
   product: "Codex",
+  // Who runs the status page. Used when a vendor-wide incident doesn't touch any
+  // of our scoped components ("...but OpenAI is reporting a wider incident").
+  vendor: "OpenAI",
 
   // OpenAI public Statuspage feed.
   statusUrl: "https://status.openai.com/api/v2/summary.json",
@@ -48,12 +51,13 @@ window.SITE = {
         "Codex is up. The CLI breathes again.",
         "Codex is up. Tell Cursor it can sit back down.",
         "Codex is up. Tibo smiled upon us today.",
-        "Codex is up. The rubber duck may stand down.",
         "Codex is up. Merge with reckless confidence.",
-        "Codex is up. Your impostor syndrome has logged off.",
         "Codex is up. Promote yourself back to 10x.",
         "Codex is up. The autocomplete autocompletes once more.",
         "Codex is up. Go ship something you'll regret on Friday.",
+        "Codex is up. Alex Albert can go back to his own timeline.",
+        "Codex is up. Uninstall the backup CLI. Or don't. We won't tell.",
+        "Codex is up. Your subagents are back on the payroll.",
       ],
       subline: "Codex is up. Back to work.",
     },
@@ -89,11 +93,32 @@ window.SITE = {
     unreachable: "Can't even reach the status page. That's rarely a good sign.",
   },
 
-  // OpenAI exposes many services. This site's YES/NO verdict should be based only
-  // on Codex-relevant components, not the global OpenAI status indicator.
+  // OpenAI exposes ~25 services. This site's YES/NO verdict is scoped to the
+  // Codex-relevant ones rather than the global OpenAI indicator.
+  //
+  // ⚠ THESE STRINGS MUST MATCH OpenAI'S PUBLISHED COMPONENT NAMES EXACTLY (case-insensitive).
+  // They are not ours to choose — OpenAI renames and retires components without notice.
+  // A previous list ("Codex API", "CLI", "VS Code extension") matched NOTHING Codex-related,
+  // so the verdict was silently computed from Login + Realtime alone for months.
+  //
+  // To re-check the live names before editing:
+  //   curl -s https://status.openai.com/api/v2/summary.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>JSON.parse(s).components.forEach(c=>console.log(c.name)))"
+  //
+  // As published on 2026-08-06:
+  //   Images, Sites, Responses, Codex in ChatGPT Desktop, Login, Audio, Login,
+  //   Compliance API, Files, FedRAMP, Ads Manager, Conversations, Search, Sora,
+  //   Ads API, Fine-tuning, ChatGPT Atlas, Deep Research, Image Generation, Agent,
+  //   Realtime, Voice mode, Batch, Embeddings, Moderations
+  //
+  // (Note "Login" appears TWICE, under two different groups — script.js collapses
+  // duplicate names, keeping the worse status of the pair.)
   components: {
     statusSource: "components",
-    include: ["Codex API", "CLI", "VS Code extension", "Login", "Realtime"],
+    include: [
+      "Codex in ChatGPT Desktop", // the only literally-Codex component OpenAI publishes
+      "Responses",                // the API surface the Codex CLI/extension calls
+      "Login",                    // no auth, no Codex
+    ],
     limit: 8,
   },
 
@@ -286,5 +311,49 @@ window.SITE = {
     "The agent stopped, the cursor blinks, and the abyss blinks back.",
     "I'm one outage away from reading my own stack trace like a fortune teller.",
     "Productivity is temporary. The smash button is forever.",
+
+    // --- The rival camp's public face. Alex Albert is Anthropic's developer-relations
+    // lead; isclaudeup ribs Tibo the same way. Keep these AFFECTIONATE and about the
+    // narrator's own paranoia — never put words or actions in a real person's mouth. ---
+    "Codex is down and Alex Albert has never been more insufferable.",
+    "Somewhere, Alex Albert is enjoying this far too much.",
+    "If I open Claude now, Alex Albert wins. I refuse.",
+    "Alex Albert's timeline is suspiciously cheerful this morning.",
+    "I'd defect to the Claude side, but I'd have to learn a whole new CLI.",
+    "Do not let Alex Albert see the panic counter.",
+    "I will not give Alex Albert the satisfaction. I will simply sit here.",
+    "Alex Albert is out there shipping and I am out here refreshing.",
+
+    // --- The switching cluster: leaving in shame, coming back pretending it never happened. ---
+    "Switching to Claude 'just for today'. That's what they all say.",
+    "I installed Claude Code during the last outage and never quite uninstalled it.",
+    "My loyalty lasts exactly as long as the outage does.",
+    "Every outage makes me five percent more multi-model.",
+    "I'm not switching, I'm diversifying.",
+    "Came back the second it was up. Claude will never know.",
+    "I keep Claude Code installed the way you keep a spare tyre.",
+    "The switching cost is emotional, not technical.",
+    "Two CLIs, one keyboard, zero loyalty.",
+    "I ran the same prompt in Claude out of spite. It was fine. That's worse.",
+    "If it's down again tomorrow I'm switching, and we both know I'm lying.",
+    "I have a backup subscription for exactly this scenario and I resent it.",
+    "Nothing radicalises a developer like four minutes of downtime.",
+    "I'm one more outage from a very awkward conversation with my ChatGPT plan.",
+
+    // --- Agent-era material: the workflow is bigger than one chat box now. ---
+    "My subagents are sitting there, unemployed.",
+    "The MCP servers are up. Nothing to serve them to.",
+    "The agent opened forty PRs and then vanished. Classic.",
+    "Turns out 'autonomous' still requires the servers to be switched on.",
+    "I finally have time to read what the agent actually did last week. Regrets.",
+    "Context compaction hit, and then so did the outage.",
+    "I reviewed a diff by hand today. I need a moment.",
+    "My whole workflow is one API away from being a hobby.",
+    "Rate limits I can plan around. Absence is harder.",
+    "DeepSeek is one tab away and I am being very strong about this.",
+    "Kimi and Qwen are apparently having a wonderful day.",
+    "Mistral said bonjour and I nearly caved.",
+    "The orchestrator has nothing to orchestrate.",
+    "Somewhere a cron job is still cheerfully firing into the void.",
   ],
 };

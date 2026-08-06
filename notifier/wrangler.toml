@@ -17,8 +17,17 @@ id = "78f8d0b3c68a45d895345cd79309500f"
 [vars]
 STATUS_URL = "https://status.openai.com/api/v2/summary.json"
 
-# OpenAI exposes many services. Recovery email state is scoped to these components.
-COMPONENT_INCLUDE = "Codex API,CLI,VS Code extension,Login,Realtime"
+# OpenAI exposes ~25 services. Recovery email state is scoped to these components.
+#
+# ⚠ MUST match OpenAI's published component names exactly (case-insensitive), and they
+# rename/retire components without notice. Keep this in sync with config.js `components.include`.
+# The previous value ("Codex API,CLI,VS Code extension,Login,Realtime") matched no Codex
+# component at all, so a Codex outage could never fire a recovery email. The worker now
+# logs a warning for every name it can't find — check `wrangler tail` after a deploy.
+#
+# Re-check live names:
+#   curl -s https://status.openai.com/api/v2/summary.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>JSON.parse(s).components.forEach(c=>console.log(c.name)))"
+COMPONENT_INCLUDE = "Codex in ChatGPT Desktop,Responses,Login"
 
 # Codex notify list (Brevo → Contacts → Lists → "iscodexup", id 10).
 BREVO_LIST_ID = "10"

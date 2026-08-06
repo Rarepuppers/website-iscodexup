@@ -41,13 +41,33 @@ function saveState(env, state) {
   return env.STATE.put(STATE_KEY, JSON.stringify(state));
 }
 
+// Narrow the feed to the components we actually notify on.
+//
+// COMPONENT_INCLUDE names must match OpenAI's published component names exactly.
+// A stale list is invisible in normal operation — it just quietly stops matching —
+// so log loudly on every mismatch. A previous list matched no Codex component at
+// all, which meant a real Codex outage could never trigger a recovery email.
 function filteredComponents(data, c) {
-  let comps = (data.components || []).filter((component) => !component.group);
-  if (c.componentInclude.length) {
-    const want = c.componentInclude.map((s) => s.toLowerCase());
-    comps = comps.filter((component) => want.includes((component.name || "").toLowerCase()));
+  const all = (data.components || []).filter((component) => !component.group);
+  if (!c.componentInclude.length) return all;
+
+  const want = c.componentInclude.map((s) => s.toLowerCase());
+  const have = new Set(all.map((component) => (component.name || "").toLowerCase()));
+  const missing = c.componentInclude.filter((n) => !have.has(n.toLowerCase()));
+  if (missing.length) {
+    console.warn(
+      `COMPONENT_INCLUDE names absent from the live feed: ${missing.join(", ")}. ` +
+        `Published names: ${all.map((component) => component.name).join(", ")}`
+    );
   }
-  return comps;
+
+  const matched = all.filter((component) => want.includes((component.name || "").toLowerCase()));
+  if (!matched.length) {
+    console.error(
+      "COMPONENT_INCLUDE matched NOTHING — falling back to the page-level indicator. Fix wrangler.toml."
+    );
+  }
+  return matched;
 }
 
 function indicatorFromComponentStatus(status) {
