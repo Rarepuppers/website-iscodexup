@@ -370,6 +370,23 @@ body[data-state="degraded"] .alternatives { display: block; }
 .alt-list span { color: var(--muted); font-size: 13px; }
 .alt-disclaimer { color: var(--muted); font-size: 12px; margin-top: 14px; }
 
+/* ---------- WAITING ROOM (outage only) ---------- */
+/* Same outage gating as .alternatives, but visually quieter: this is a nice-to-have
+   for a blocked reader, not a substitute tool, so it must not out-shout the
+   backup-tools slot above it. */
+.waiting-room {
+  display: none;
+  margin: 22px auto 0;
+  max-width: 440px;
+  text-align: center;
+}
+body[data-state="down"] .waiting-room,
+body[data-state="degraded"] .waiting-room { display: block; }
+.waiting-room h2 { margin: 0 0 4px; font-size: 16px; color: var(--muted); font-weight: 700; }
+.waiting-room > p { color: var(--muted); font-size: 13px; margin: 0 auto 12px; }
+.waiting-room .alt-list { margin-top: 0; }
+.waiting-room .alt-disclaimer a { color: var(--muted); }
+
 /* ---------- COMPANION TOOLS (always visible — pairs WITH the product, not a substitute) ---------- */
 /* Deliberately separate from .alternatives: these are not outage fallbacks, so they
    show in the calm "up" view too. Kept quieter than .alternatives so the backup-tools
