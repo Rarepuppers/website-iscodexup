@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Badge — Is Codex Up</title>
+  <meta name="description" content="A live OpenAI Codex status badge you can embed in a README, docs page or dashboard. Free, no sign-up, updates itself." />
+  <meta name="robots" content="all" />
+  <link rel="canonical" href="https://iscodexup.com/badge.html" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .badge-demo { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 18px; background: #0f1115; border-radius: 10px; margin: 18px 0; }
+    .snippet { position: relative; margin: 14px 0 22px; }
+    .snippet pre { background: #0f1115; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 14px 92px 14px 14px; overflow-x: auto; margin: 0; }
+    .snippet code { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 13px; white-space: pre; }
+    .snippet button { position: absolute; top: 9px; right: 9px; border: 1px solid rgba(255,255,255,.22); background: #1b1e26; color: #eaeaf0; border-radius: 999px; padding: 5px 13px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .snippet button:hover { background: #262a34; }
+    .snippet button:focus-visible { outline: 2px solid #7c5cff; outline-offset: 2px; }
+    .badge-note { color: var(--muted, #a8a8b8); font-size: 14px; }
+  </style>
+</head>
+<body data-state="up">
+  <main class="wrap legal">
+    <header class="topbar">
+      <a class="brand" href="/">iscodexup<span class="dot">.com</span></a>
+    </header>
+
+    <h1>Embed a live OpenAI Codex status badge</h1>
+    <p class="legal-updated">Free, no sign-up, no tracking. It updates itself.</p>
+
+    <p>
+      Drop this into a README, a docs page, an internal dashboard — anywhere it helps to
+      show at a glance whether Codex is up. It reads the same official status feed this
+      site does, and it re-renders itself every minute.
+    </p>
+
+    <div class="badge-demo">
+      <img id="badge-live" src="" alt="Codex status badge" width="131" height="20" />
+      <span class="badge-note">Live right now — this is the real badge, not a picture of one.</span>
+    </div>
+
+    <h2>Markdown</h2>
+    <div class="snippet">
+      <pre><code id="snip-md"></code></pre>
+      <button type="button" data-copy="snip-md">Copy</button>
+    </div>
+
+    <h2>HTML</h2>
+    <div class="snippet">
+      <pre><code id="snip-html"></code></pre>
+      <button type="button" data-copy="snip-html">Copy</button>
+    </div>
+
+    <h2>Already using Shields?</h2>
+    <p>
+      There's a Shields endpoint too, so you can render it in whatever style your other
+      badges use:
+    </p>
+    <div class="snippet">
+      <pre><code id="snip-shields"></code></pre>
+      <button type="button" data-copy="snip-shields">Copy</button>
+    </div>
+
+    <h2>Options</h2>
+    <ul>
+      <li><code>?label=codex</code> — change the left-hand text.</li>
+      <li>States are <strong>operational</strong>, <strong>degraded</strong>,
+        <strong>major outage</strong> and <strong>outage</strong>. If the feed can't be
+        reached the badge says <strong>unknown</strong> rather than lying about it.</li>
+      <li>Cached for 60 seconds, so it stays current during an incident without hammering
+        anyone's servers.</li>
+    </ul>
+
+    <p class="badge-note">
+      Not affiliated with, endorsed by, or sponsored by OpenAI. OpenAI and Codex are
+      trademarks of OpenAI. Status is read from the official
+      <a href="https://status.openai.com" target="_blank" rel="noopener">status.openai.com</a> feed, scoped to the Codex components.
+    </p>
+
+    <footer class="foot">
+      <p class="foot-main">© 2026 Is Codex Up — a project of Snackpack Universe.</p>
+      <p class="foot-legal">
+        <a href="/">Live status</a> · <a href="history.html">Outage history</a> ·
+        <a href="privacy.html">Privacy</a> · <a href="sponsor.html">Sponsor</a>
+      </p>
+    </footer>
+  </main>
+
+<script>
+(function () {
+  // ── SET THIS ONCE, AFTER `wrangler deploy` ─────────────────────────────
+  // The notifier Worker serves /badge.svg. iscodexup.com is on GitHub Pages
+  // and Cloudflare is analytics-only (it does not proxy this domain), so the
+  // badge cannot live at iscodexup.com/badge.svg without moving DNS to
+  // Cloudflare. Until then this is the workers.dev origin that wrangler prints.
+  var BADGE_ORIGIN = "https://iscodexup-notifier.YOUR-SUBDOMAIN.workers.dev";
+  // ───────────────────────────────────────────────────────────────────────
+
+  var svg = BADGE_ORIGIN + "/badge.svg";
+  var site = "https://iscodexup.com";
+
+  // Until BADGE_ORIGIN is filled in, show an honest "not live yet" state rather
+  // than a broken image and copy buttons that hand out a placeholder URL.
+  if (BADGE_ORIGIN.indexOf("YOUR-SUBDOMAIN") !== -1) {
+    document.body.classList.add("badge-unconfigured");
+    var demo = document.querySelector(".badge-demo");
+    demo.innerHTML = '<span class="badge-note">The badge endpoint isn\'t live yet &mdash; check back shortly.</span>';
+    document.querySelectorAll(".snippet, h2").forEach(function (el) { el.hidden = true; });
+    return;
+  }
+
+  document.getElementById("badge-live").src = svg;
+  // A dead endpoint should say so, not leave a broken-image icon on the page.
+  document.getElementById("badge-live").addEventListener("error", function () {
+    this.replaceWith(Object.assign(document.createElement("span"), {
+      className: "badge-note",
+      textContent: "Badge endpoint unreachable right now.",
+    }));
+  });
+
+  var snippets = {
+    "snip-md": "[![Codex status](" + svg + ")](" + site + ")",
+    "snip-html": '<a href="' + site + '"><img src="' + svg + '" alt="Codex status"></a>',
+    "snip-shields": "https://img.shields.io/endpoint?url=" + encodeURIComponent(BADGE_ORIGIN + "/badge.json")
+  };
+  Object.keys(snippets).forEach(function (id) {
+    document.getElementById(id).textContent = snippets[id];
+  });
+
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = document.getElementById(btn.getAttribute("data-copy")).textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        var was = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = was; }, 1600);
+      }).catch(function () {
+        btn.textContent = "Press Ctrl+C";
+      });
+    });
+  });
+})();
+</script>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "cd86c3d12ce84ba78d722eaa217163dc"}'></script>
+<!-- End Cloudflare Web Analytics -->
+</body>
+</html>

@@ -193,6 +193,82 @@ async function sendRecoveryCampaign(env, c, { now }) {
   console.log(`recovery campaign ${id} sent to list ${c.listId}`);
 }
 
+// ─── Embeddable status badge ─────────────────────────────────────────────
+// A live SVG badge other people can drop into a README or docs page. Every
+// embed is a permanent contextual link back, placed because it is useful to
+// the embedder — which is the whole point.
+//
+// The status feed is fetched through the Cloudflare edge cache with a 60s TTL,
+// so badge traffic cannot amplify load on the upstream status page no matter
+// how many READMEs embed it.
+
+const BADGE_STATES = {
+  none:     { text: "operational", color: "#3fa66a" },
+  minor:    { text: "degraded",    color: "#d68a1e" },
+  major:    { text: "major outage", color: "#c8443a" },
+  critical: { text: "outage",      color: "#c8443a" },
+  unknown:  { text: "unknown",     color: "#7a7a86" },
+};
+
+async function currentIndicator(env) {
+  try {
+    const res = await fetch(env.STATUS_URL, {
+      cf: { cacheTtl: 60, cacheEverything: true },
+    });
+    if (!res.ok) return "unknown";
+    const data = await res.json();
+    // Scoped to the Codex components, same as tick(). OpenAI's page-level
+    // indicator covers all of ChatGPT, so using it would let the badge read
+    // "operational" during a Codex-only incident the site reports as down.
+    return scopedIndicator(data, cfg(env));
+  } catch (_) {
+    return "unknown";
+  }
+}
+
+// Rough advance width for 11px DejaVu/Verdana-ish text. Shields does the same
+// thing; exactness doesn't matter, consistent padding does.
+function textWidth(s) {
+  return Math.ceil(s.length * 6.2) + 2;
+}
+
+function badgeSvg(label, status) {
+  const s = BADGE_STATES[status] || BADGE_STATES.unknown;
+  const lw = textWidth(label) + 10;
+  const rw = textWidth(s.text) + 10;
+  const w = lw + rw;
+  const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const alt = `${label}: ${s.text}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="20" role="img" aria-label="${esc(alt)}">
+  <title>${esc(alt)}</title>
+  <linearGradient id="g" x2="0" y2="100%">
+    <stop offset="0" stop-color="#fff" stop-opacity=".7"/>
+    <stop offset=".1" stop-color="#aaa" stop-opacity=".1"/>
+    <stop offset=".9" stop-color="#000" stop-opacity=".3"/>
+    <stop offset="1" stop-color="#000" stop-opacity=".5"/>
+  </linearGradient>
+  <clipPath id="c"><rect width="${w}" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#c)">
+    <rect width="${lw}" height="20" fill="#40404a"/>
+    <rect x="${lw}" width="${rw}" height="20" fill="${s.color}"/>
+    <rect width="${w}" height="20" fill="url(#g)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,Geneva,sans-serif" font-size="11">
+    <text x="${lw / 2}" y="15" fill="#010101" fill-opacity=".3">${esc(label)}</text>
+    <text x="${lw / 2}" y="14">${esc(label)}</text>
+    <text x="${lw + rw / 2}" y="15" fill="#010101" fill-opacity=".3">${esc(s.text)}</text>
+    <text x="${lw + rw / 2}" y="14">${esc(s.text)}</text>
+  </g>
+</svg>`;
+}
+
+// Embeds are cross-origin by definition, and a stale badge is worse than a
+// slightly expensive one — 60s keeps it honest during an incident.
+const BADGE_HEADERS = {
+  "cache-control": "public, max-age=60, s-maxage=60",
+  "access-control-allow-origin": "*",
+};
+
 export default {
   async scheduled(event, env, ctx) {
     ctx.waitUntil(tick(env));
@@ -201,6 +277,29 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     const authed = env.ADMIN_KEY && url.searchParams.get("key") === env.ADMIN_KEY;
+
+    // Public, embeddable. ?label= lets an embedder retitle it (default "claude").
+    if (url.pathname === "/badge.svg") {
+      const label = (url.searchParams.get("label") || env.PRODUCT || "status").slice(0, 24);
+      const svg = badgeSvg(label.toLowerCase(), await currentIndicator(env));
+      return new Response(svg, {
+        headers: { "content-type": "image/svg+xml; charset=utf-8", ...BADGE_HEADERS },
+      });
+    }
+    // Shields.io endpoint format, so people already using shields can render it
+    // in their own style: https://img.shields.io/endpoint?url=<this>
+    if (url.pathname === "/badge.json") {
+      const s = BADGE_STATES[await currentIndicator(env)] || BADGE_STATES.unknown;
+      return new Response(
+        JSON.stringify({
+          schemaVersion: 1,
+          label: (env.PRODUCT || "status").toLowerCase(),
+          message: s.text,
+          color: s.color,
+        }),
+        { headers: { "content-type": "application/json; charset=utf-8", ...BADGE_HEADERS } },
+      );
+    }
 
     if (url.pathname === "/state") {
       const state = await loadState(env);
