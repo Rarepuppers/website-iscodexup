@@ -94,9 +94,7 @@
   // and Cloudflare is analytics-only (it does not proxy this domain), so the
   // badge cannot live at iscodexup.com/badge.svg without moving DNS to
   // Cloudflare — hence the workers.dev origin.
-  // NOTE: pending `wrangler deploy` from notifier/. Until then this 404s and
-  // the page shows "Badge endpoint unreachable" — which is why nothing links
-  // here yet. Add the footer link once the deploy is done.
+  // Deployed 2026-08-13.
   var BADGE_ORIGIN = "https://iscodexup-notifier.snackpackuniverse.workers.dev";
 
   var svg = BADGE_ORIGIN + "/badge.svg";
