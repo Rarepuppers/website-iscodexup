@@ -74,6 +74,27 @@ function navFor(file) {
   ].join("\n");
 }
 
+/**
+ * Index just past the closing tag of the `.brand` element, counting nested
+ * same-name tags so an inner <span class="dot"> cannot end the match early.
+ * Returns -1 when there is no brand.
+ */
+function brandEnd(html) {
+  const open = /<(span|a)\s[^>]*class="brand"[^>]*>/.exec(html);
+  if (!open) return -1;
+  const tag = open[1];
+  const scan = new RegExp(`<${tag}\\b[^>]*>|</${tag}>`, "g");
+  scan.lastIndex = open.index + open[0].length;
+
+  let depth = 1;
+  let m;
+  while ((m = scan.exec(html))) {
+    depth += m[0].startsWith("</") ? -1 : 1;
+    if (depth === 0) return m.index + m[0].length;
+  }
+  return -1; // unbalanced markup — better to skip than to corrupt the page
+}
+
 const files = (await fs.readdir(root)).filter((f) => f.endsWith(".html"));
 
 let changed = 0;
@@ -101,14 +122,18 @@ for (const file of files) {
   } else {
     // Insert immediately after the brand, inside the existing topbar, so the
     // nav shares the header's flex row rather than creating a second bar.
-    // The brand is a <span> on the home page and an <a href="/"> on every
-    // other page, so match either element rather than assuming one.
-    const brandRe = /<(span|a) class="brand"[^>]*>[\s\S]*?<\/\1>/;
-    const m = html.match(brandRe);
-    if (m) {
-      html = html.replace(m[0], m[0] + "\n" + navBlock);
-    } else {
+    //
+    // The brand is a <span> on the home page and an <a href="/"> elsewhere, and
+    // BOTH contain a nested <span class="dot">. A regex cannot be used here: a
+    // lazy `[\s\S]*?</span>` stops at the inner .dot's closing tag, which put
+    // the whole nav *inside* the brand element and dropped it onto its own row.
+    // That is exactly what happened on iscodexup's home page. Balance the tags
+    // instead.
+    const end = brandEnd(html);
+    if (end === -1) {
       console.warn("  no .brand found, nav skipped:", file);
+    } else {
+      html = html.slice(0, end) + "\n" + navBlock + html.slice(end);
     }
   }
 

@@ -94,9 +94,16 @@
   flex-wrap: wrap;
 }
 
+/* margin-left:auto rather than relying on the topbar's space-between: when the
+   header wraps on a narrow screen the nav becomes its own flex line, and
+   space-between then puts a lone item at flex-start. An auto margin keeps it
+   on the right in both states, so it does not jump sides at the wrap point. */
+.topbar nav { margin-left: auto; }
+
 .nav-links {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
   margin: 0;
   padding: 0;
