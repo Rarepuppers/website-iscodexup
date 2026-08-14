@@ -93,6 +93,18 @@ window.SITE = {
     unreachable: "Can't even reach the status page. That's rarely a good sign.",
   },
 
+  // Sponsor rail placements, rendered by rails.js into the two fixed corner
+  // rails. Empty = the right rail shows only the "Advertise here" offer, which
+  // is the correct state until something is actually sold.
+  //
+  //   { name: "Acme", blurb: "Ship faster.", url: "https://acme.dev",
+  //     logo: "assets/acme.png" }   // logo optional, falls back to the initial
+  //
+  // Entries need both `name` and `url` or they are skipped. Links are emitted
+  // rel="sponsored noopener" so a paid placement never passes ranking signal.
+  sponsors: [],
+
+
   // OpenAI exposes ~25 services. This site's YES/NO verdict is scoped to the
   // Codex-relevant ones rather than the global OpenAI indicator.
   //

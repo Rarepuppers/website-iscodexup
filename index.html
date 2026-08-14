@@ -519,6 +519,14 @@
     })();
   </script>
 
+  <!-- Sponsor rails. Fixed to the bottom corners, shown only when the viewport is
+       wide enough to fit them beside the 720px content column (see style.css).
+       Rendered from window.SITE.sponsors by rails.js; last in the DOM so they
+       come last in tab order. -->
+  <aside class="rail rail--left" data-rail="left" aria-label="Sponsors" hidden></aside>
+  <aside class="rail rail--right" data-rail="right" aria-label="Sponsors"></aside>
+  <script defer src="rails.js"></script>
+
   <!-- Cloudflare Web Analytics — privacy-friendly, cookieless (no consent banner needed) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon='{"token": "cd86c3d12ce84ba78d722eaa217163dc"}'></script>

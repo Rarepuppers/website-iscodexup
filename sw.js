@@ -6,7 +6,7 @@
 // script.js/config.js cache-first, so returning visitors kept running whatever
 // build they first installed — a fixed bug would never reach them. Code and markup
 // are now network-first (below); only images stay cache-first.
-const CACHE = "iscodexup-shell-v2";
+const CACHE = "iscodexup-shell-v3";
 const SHELL = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const SHELL = [
   "./script.js",
   "./history.js",
   "./config.js",
+  "./rails.js",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./assets/codex-status-up-online-green-transparent.webp",

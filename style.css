@@ -546,3 +546,136 @@ body[data-state="degraded"] .waiting-room { display: block; }
 .foot-main { font-size: 14px; color: var(--fg); }
 .foot-network { font-size: 12px; opacity: .78; }
 .foot-legal { font-size: 12px; opacity: .65; }
+
+/* ---------------------------------------------------------------------------
+   Sponsor rails
+   ---------------------------------------------------------------------------
+   Two fixed columns pinned to the bottom corners of the viewport. They use the
+   dead space either side of the 720px content column, so they never push, wrap
+   or overlap anything the reader came for.
+
+   Why fixed-to-bottom rather than sticky-in-a-sidebar: the page has no sidebar
+   to stick to, and the verdict at the top is the whole point of the site — a
+   rail anchored to the top would compete with it. Bottom corners stay visible
+   at any scroll position while reading as chrome, not content.
+
+   Visibility is purely a question of whether there is room, and the breakpoints
+   are set from measured clearance rather than arithmetic. The content column is
+   720px, so a 136px rail + 16px gutter needs (720/2 + 152) = 512px of half-width
+   before it stops touching the text — but a vertical scrollbar eats ~15px of the
+   viewport that `min-width` does not know about. At a literal 1024px the rail
+   measured 7px ON TOP of the content column. The breakpoints below are therefore
+   1100px and 1280px, which leave a real ~30px and ~56px gap once the scrollbar
+   is accounted for. Below that the rails are hidden outright rather than shrunk
+   — a squeezed ad card over a phone-width layout is exactly the intrusion this
+   layout exists to avoid. The footer already carries a Sponsor link.
+--------------------------------------------------------------------------- */
+
+.rail {
+  position: fixed;
+  bottom: 16px;
+  z-index: 40;
+  display: none;              /* opt in per breakpoint below */
+  flex-direction: column;
+  gap: 12px;
+  width: 136px;
+}
+
+.rail--left  { left: 16px; }
+.rail--right { right: 16px; }
+
+.rail-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid #2a2f3a;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--fg);
+  text-decoration: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.rail-card:hover,
+.rail-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #3d4452;
+}
+
+.rail-card:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+/* The "this space is available" variant. Dashed, so it reads as an offer rather
+   than as a real placement someone paid for. */
+.rail-card--offer { border-style: dashed; border-color: #39404e; }
+
+.rail-label {
+  position: absolute;
+  top: 5px;
+  right: 9px;
+  font-size: 7px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rail-mark {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #232833;
+  font-size: 15px;
+  overflow: hidden;
+}
+
+.rail-card--offer .rail-mark {
+  border-radius: 50%;
+  background: var(--warn);
+  color: #1a1200;
+  font-weight: 800;
+}
+
+.rail-mark img { width: 100%; height: 100%; object-fit: contain; }
+
+.rail-copy { min-width: 0; }
+
+.rail-copy strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.15;
+  /* Long sponsor names must not blow the rail out or spill over the card. */
+  overflow-wrap: anywhere;
+}
+
+/* The blurb is the first thing to go when space is tight — the name and the
+   fact that it is clickable carry the placement on their own. */
+.rail-copy span {
+  display: none;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+@media (min-width: 1100px) and (min-height: 600px) {
+  .rail { display: flex; }
+}
+
+@media (min-width: 1280px) and (min-height: 600px) {
+  .rail { width: 200px; gap: 14px; }
+  .rail-card { padding: 12px; gap: 10px; }
+  .rail-copy strong { font-size: 13px; }
+  .rail-copy span { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-card { transition: none; }
+  .rail-card:hover, .rail-card:focus-visible { transform: none; }
+}

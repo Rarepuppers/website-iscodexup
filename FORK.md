@@ -88,19 +88,27 @@ the browser console and `wrangler tail` after any change here.
 
 ## 1b. Shared JS: keep the copies in sync
 
-`config.js` is per-site, but `script.js` and `history.js` are **shared code that
-must stay byte-identical across sites**. They previously drifted, and the stale
-copy on `iscodexup` was the one carrying the broken component logic above.
+`config.js` is per-site, but `script.js`, `history.js` and `rails.js` are
+**shared code that must stay byte-identical across sites**. They previously
+drifted, and the stale copy on `iscodexup` was the one carrying the broken
+component logic above.
 
-After changing either file, copy it to the sibling repo in the same commit:
+After changing any of them, copy it to the sibling repo in the same commit:
 
 ```bash
 cp website-isclaudeup/script.js  website-iscodexup/script.js
 cp website-isclaudeup/history.js website-iscodexup/history.js
+cp website-isclaudeup/rails.js   website-iscodexup/rails.js
 ```
 
 Anything genuinely per-site belongs in `config.js`, never in a local edit to
-`script.js`.
+`script.js`. Sponsor placements are per-site by design: they live in
+`window.SITE.sponsors`, so the two sites can sell different slots without the
+shared renderer diverging.
+
+The sponsor-rail CSS at the foot of `style.css` is shared too. `style.css`
+otherwise differs between the forks only in two product-name comments, so treat
+any larger divergence as accidental drift.
 
 ## 1c. Bump the service worker cache on every code deploy
 
