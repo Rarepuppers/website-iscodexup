@@ -73,11 +73,35 @@
   </script>
 
   <link rel="stylesheet" href="style.css" />
+<!-- theme:generated -->
+<script>
+  (function () {
+    var d = document.documentElement, t = null;
+    try { t = localStorage.getItem("snackpack.theme.v1"); } catch (e) {}
+    if (t !== "dark" && t !== "light" && t !== "cream") {
+      t = matchMedia("(prefers-color-scheme: light)").matches ? "cream" : "dark";
+    }
+    d.setAttribute("data-theme", t);
+    d.setAttribute("data-theme-default", "dark");
+  })();
+</script>
+<script defer src="theme.js"></script>
+<!-- /theme:generated -->
 </head>
 <body data-state="up" class="page-history">
   <main class="wrap">
     <header class="topbar">
       <a class="brand" href="/">iscodexup<span class="dot">.com</span></a>
+<!-- nav:generated -->
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="index.html">Status</a></li>
+        <li><a href="history.html" aria-current="page">History</a></li>
+        <li><a href="badge.html">Badge</a></li>
+        <li><a href="sponsor.html">Sponsor</a></li>
+      </ul>
+    </nav>
+<!-- /nav:generated -->
     </header>
 
     <section class="history-intro">

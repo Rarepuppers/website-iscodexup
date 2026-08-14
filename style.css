@@ -10,7 +10,150 @@
   --warn: #d97706;
   --warn-soft: #3a2606;
   --radius: 18px;
+  --fg-soft: #cbd2da;
+  --line: #24272f;
+  --line-strong: #2c2f37;
+  --line-strongest: rgba(255, 255, 255, .34);
+  --overlay: rgba(255, 255, 255, .06);
+  --on-bright: #0f1115;
 }
+
+/* ---------------------------------------------------------------------------
+   Themes
+   ---------------------------------------------------------------------------
+   dark (default) → light → cream, cycled by theme.js and set on <html> before
+   first paint by an inline snippet in each page's <head>.
+
+   This page tints toward the verdict (see body[data-state] below), so the
+   "-soft" colours are not decoration — they ARE the page background during an
+   outage. Each theme therefore needs its own tint that stays readable: deep
+   near-blacks on dark, pale washes on the two light themes.
+
+   --on-bright is text that sits on a saturated badge (the green/red pills), so
+   it stays dark in every theme; the badge colour underneath does not change.
+--------------------------------------------------------------------------- */
+
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --fg: #f4f4f5;
+  --muted: #9aa0a6;
+  --card: #1a1d24;
+  --fg-soft: #cbd2da;
+  --line: #24272f;
+  --line-strong: #2c2f37;
+  --line-strongest: rgba(255, 255, 255, .34);
+  --overlay: rgba(255, 255, 255, .06);
+  --on-bright: #0f1115;
+  --up: #16a34a;  --up-soft: #052e16;
+  --down: #dc2626; --down-soft: #3f0d0d;
+  --warn: #d97706; --warn-soft: #3a2606;
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f8fd;
+  --fg: #16202c;
+  --muted: #5b6b7c;
+  --card: #ffffff;
+  --fg-soft: #445468;
+  --line: rgba(22, 32, 44, .12);
+  --line-strong: rgba(22, 32, 44, .2);
+  --line-strongest: rgba(22, 32, 44, .38);
+  --overlay: rgba(22, 32, 44, .05);
+  --on-bright: #ffffff;
+  --up: #15803d;  --up-soft: #d8f3e0;
+  --down: #b91c1c; --down-soft: #fbdcdc;
+  --warn: #b45309; --warn-soft: #fbeccd;
+}
+
+:root[data-theme="cream"] {
+  --bg: #f6efe4;
+  --fg: #201713;
+  --muted: #6a5b52;
+  --card: #fffdf8;
+  --fg-soft: #4c4039;
+  --line: rgba(32, 23, 19, .12);
+  --line-strong: rgba(32, 23, 19, .2);
+  --line-strongest: rgba(32, 23, 19, .38);
+  --overlay: rgba(32, 23, 19, .05);
+  --on-bright: #fffdf8;
+  --up: #1f8f77;  --up-soft: #ddefe9;
+  --down: #c0392b; --down-soft: #f8e2dd;
+  --warn: #b9481e; --warn-soft: #f7e6d5;
+}
+
+/* ---------- Top nav ----------------------------------------------------- */
+/* The site had no nav: history, badge and sponsor were reachable only from body
+   copy and the footer, which is why the outage-history page -- the one piece of
+   evergreen, indexable content here -- was effectively unlinked. */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nav-links a:hover { color: var(--fg); background: var(--overlay); }
+.nav-links a[aria-current="page"] { color: var(--fg); background: var(--overlay); }
+.nav-links a:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+/* ---------- Theme toggle ------------------------------------------------ */
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.theme-toggle:hover { border-color: var(--line-strongest); transform: rotate(-12deg); }
+.theme-toggle:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+.nav-theme-item { display: flex; align-items: center; margin-left: 2px; }
+
+.theme-toggle--floating {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle { transition: none; }
+  .theme-toggle:hover { transform: none; }
+}
+
 
 * { box-sizing: border-box; }
 
@@ -155,7 +298,7 @@ body[data-state="down"] .smash img { filter: drop-shadow(0 0 18px rgba(220, 38, 
   font-weight: 700;
   color: var(--muted);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, .16);
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
   cursor: pointer;
   transition: color .15s ease, border-color .15s ease, background .15s ease;
@@ -163,8 +306,8 @@ body[data-state="down"] .smash img { filter: drop-shadow(0 0 18px rgba(220, 38, 
 .share:hover,
 .share:focus-visible {
   color: var(--fg);
-  border-color: rgba(255, 255, 255, .34);
-  background: rgba(255, 255, 255, .04);
+  border-color: var(--line-strongest);
+  background: var(--overlay);
 }
 .share .share-icon { font-size: 15px; line-height: 1; }
 /* Nudge toward the verdict colour during an incident — that's when sharing matters. */
@@ -198,7 +341,7 @@ body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
   border-radius: 4px;
   padding: 3px 2px;
   margin: 0 1px;
-  box-shadow: inset 0 0 0 1px #2c2f37, 0 1px 2px rgba(0,0,0,.6);
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0,0,0,.6);
   /* faux split-flap seam */
   background-image: linear-gradient(transparent 49%, rgba(0,0,0,.55) 49%, rgba(0,0,0,.55) 51%, transparent 51%);
   backface-visibility: hidden;
@@ -256,8 +399,8 @@ body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
   height: 48px !important;
   padding: 0 14px !important;
   border-radius: 10px !important;
-  border: 1px solid #2c2f37 !important;
-  background: #0f1115 !important;
+  border: 1px solid var(--line-strong) !important;
+  background: var(--bg) !important;
   color: var(--fg) !important;
   font-size: 15px !important;
   font-family: inherit !important;
@@ -273,7 +416,7 @@ body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
   border-radius: 10px !important;
   cursor: pointer;
   background: #84cc16 !important;
-  color: #0f1115 !important;
+  color: var(--on-bright) !important;
   font-weight: 800 !important;
   font-size: 15px !important;
   font-family: inherit !important;
@@ -315,7 +458,7 @@ body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
 #components { list-style: none; margin: 0; padding: 0; }
 #components li {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 4px; border-bottom: 1px solid #24272f; font-size: 15px;
+  padding: 12px 4px; border-bottom: 1px solid var(--line); font-size: 15px;
 }
 #components li:last-child { border-bottom: none; }
 .pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: capitalize; }
@@ -328,7 +471,7 @@ body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
 .legal { max-width: 720px; }
 .legal h1 { font-size: clamp(28px, 7vw, 40px); margin: 18px 0 4px; }
 .legal h2 { font-size: 19px; margin: 28px 0 6px; }
-.legal p, .legal li { color: #cbd2da; line-height: 1.6; font-size: 15px; }
+.legal p, .legal li { color: var(--fg-soft); line-height: 1.6; font-size: 15px; }
 .legal ul { padding-left: 20px; }
 .legal li { margin: 8px 0; }
 .legal a { color: #fff; }
@@ -362,7 +505,7 @@ body[data-state="degraded"] .alternatives { display: block; }
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: #0f1115;
+  background: var(--bg);
   border-radius: 10px;
 }
 .alt-list a { color: var(--fg); font-weight: 700; text-decoration: none; }
@@ -409,7 +552,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
   margin: 22px 0;
 }
 .faq h2 { margin: 0 0 8px; font-size: 20px; }
-.faq details { border-bottom: 1px solid #24272f; padding: 14px 0; }
+.faq details { border-bottom: 1px solid var(--line); padding: 14px 0; }
 .faq details:last-child { border-bottom: none; padding-bottom: 0; }
 .faq summary {
   cursor: pointer;
@@ -451,7 +594,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
 .donate:hover img { filter: drop-shadow(0 0 22px rgba(132, 204, 22, .5)); }
 .donate-btn {
   background: #84cc16;
-  color: #0f1115;
+  color: var(--on-bright);
   font-weight: 800;
   font-size: 16px;
   padding: 12px 26px;
@@ -477,7 +620,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
 .crumbs a:hover, .crumbs a:focus-visible { color: var(--fg); }
 
 .history-intro h1 { font-size: clamp(28px, 7vw, 42px); margin: 10px 0 8px; line-height: 1.1; }
-.history-lede { color: #cbd2da; line-height: 1.6; font-size: 16px; margin: 0 0 10px; max-width: 640px; }
+.history-lede { color: var(--fg-soft); line-height: 1.6; font-size: 16px; margin: 0 0 10px; max-width: 640px; }
 .history-lede a { color: var(--fg); }
 .history-scope { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
 .history-cta { font-size: 14px; margin: 0 0 8px; }
@@ -494,7 +637,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
 }
 .stat-grid li {
   background: var(--card);
-  border: 1px solid rgba(255, 255, 255, .07);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
@@ -502,7 +645,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
   gap: 2px;
 }
 .stat-value { font-size: 26px; font-weight: 800; color: var(--fg); font-variant-numeric: tabular-nums; }
-.stat-label { font-size: 13px; color: #cbd2da; }
+.stat-label { font-size: 13px; color: var(--fg-soft); }
 .stat-hint { font-size: 12px; color: var(--muted); }
 
 .history-coverage { color: var(--muted); font-size: 12.5px; line-height: 1.5; margin: 10px 0 0; max-width: 640px; }
@@ -516,12 +659,12 @@ body[data-state="degraded"] .waiting-room { display: block; }
   color: var(--muted);
   margin: 22px 0 8px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  border-bottom: 1px solid var(--line);
 }
 
 .incident {
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, .05);
+  border-bottom: 1px solid var(--line);
 }
 .incident-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .incident-name { font-size: 15px; font-weight: 700; margin: 0; color: var(--fg); line-height: 1.4; }
@@ -534,7 +677,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
 .pill.impact-major { background: var(--down-soft); color: #f87171; }
 .pill.impact-minor { background: var(--warn-soft); color: #fbbf24; }
 .pill.impact-maintenance,
-.pill.impact-none { background: rgba(255, 255, 255, .07); color: var(--muted); }
+.pill.impact-none { background: var(--overlay); color: var(--muted); }
 
 .history-empty { color: var(--muted); font-size: 14px; margin: 14px 0; }
 .page-history .faq { margin-top: 34px; }

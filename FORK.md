@@ -99,7 +99,13 @@ After changing any of them, copy it to the sibling repo in the same commit:
 cp website-isclaudeup/script.js  website-iscodexup/script.js
 cp website-isclaudeup/history.js website-iscodexup/history.js
 cp website-isclaudeup/rails.js   website-iscodexup/rails.js
+cp website-isclaudeup/theme.js   website-iscodexup/theme.js
+cp website-isclaudeup/scripts/build-chrome.mjs website-iscodexup/scripts/build-chrome.mjs
 ```
+
+`scripts/build-chrome.mjs` injects the nav and the theme snippet into every page
+and is idempotent, so after copying it just run `node scripts/build-chrome.mjs`
+in each repo rather than hand-editing headers.
 
 Anything genuinely per-site belongs in `config.js`, never in a local edit to
 `script.js`. Sponsor placements are per-site by design: they live in
