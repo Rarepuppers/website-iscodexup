@@ -225,20 +225,6 @@ body[data-state="degraded"] .verdict { color: var(--warn); }
   margin: 0 auto;
   width: clamp(160px, 42vw, 240px);
   height: auto;
-  /* Three of the four status artworks carry a 1px near-white row at the very
-     bottom (alpha 0.31-0.92) left over from however they were cut out. On the
-     cream themes it disappears into the page; on dark it reads as a bright
-     hairline under the robot. Because the source is ~1060px tall rendered at
-     ~240px, the downscale averages that row into a visible fringe across the
-     full width rather than hiding it.
-
-     Clipped rather than re-encoded: the artwork is lossy WebP at q92, and the
-     only encoder available here (ImageMagick, no cwebp) costs ~33% more bytes
-     than the original to fix one pixel. 2px of the rendered box is at most ~13
-     source rows, and every affected image has 23-39 fully transparent rows
-     above the artifact, so no real content is lost. This also covers any future
-     artwork arriving with the same edge. */
-  clip-path: inset(0 0 2px 0);
   filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .55));
   transition: filter .3s;
 }
@@ -609,9 +595,6 @@ body[data-state="degraded"] .waiting-room { display: block; }
 .donate img {
   width: clamp(130px, 34vw, 170px);
   height: auto;
-  /* Same 1px bottom edge as the mascot artwork, fainter (alpha 0.12) but the
-     same cause. 23 transparent source rows sit above it. */
-  clip-path: inset(0 0 2px 0);
   filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .5));
 }
 .donate:hover { transform: translateY(-3px); }
