@@ -39,7 +39,9 @@ const HEAD_BLOCK = [
   "    var d = document.documentElement, t = null;",
   '    try { t = localStorage.getItem("snackpack.theme.v1"); } catch (e) {}',
   '    if (t !== "dark" && t !== "light" && t !== "cream") {',
-  `      t = matchMedia("(prefers-color-scheme: light)").matches ? "cream" : "${DEFAULT_THEME}";`,
+  `      // Dark for everyone on a first visit, not conditional on the OS: this
+      // site is designed dark and that is what it should be judged on.
+      t = "${DEFAULT_THEME}";`,
   "    }",
   '    d.setAttribute("data-theme", t);',
   `    d.setAttribute("data-theme-default", "${DEFAULT_THEME}");`,
