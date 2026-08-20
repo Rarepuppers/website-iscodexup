@@ -56,6 +56,7 @@ const HEAD_BLOCK = [
 const LINKS = [
   ["index.html", "Status"],
   ["history.html", "History"],
+  ["guides.html", "Guides"],
   ["badge.html", "Badge"],
   ["sponsor.html", "Sponsor"],
 ];

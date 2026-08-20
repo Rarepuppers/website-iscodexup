@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenAI Status vs Codex Status: Why They Disagree</title>
+  <meta name="description" content="OpenAI's status page says everything is operational but Codex is clearly broken. Here is why the two disagree, and which one to trust when they do." />
+  <meta name="robots" content="all" />
+  <link rel="canonical" href="https://iscodexup.com/openai-status-vs-codex-status.html" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <meta property="og:title" content="OpenAI Status vs Codex Status: Why They Disagree" />
+  <meta property="og:description" content="Why the official status page can say operational while Codex is clearly broken." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iscodexup.com/openai-status-vs-codex-status.html" />
+  <meta property="og:image" content="https://iscodexup.com/assets/og-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why does OpenAI's status page say everything is fine when Codex is down?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OpenAI publishes around 25 separate components covering the whole product range. A global indicator averages across all of them, so a Codex-specific failure can leave the overall indicator green. Status pages are also updated by humans after an incident is confirmed, which typically lags the first user reports by several minutes to half an hour."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which components does Codex actually depend on?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Codex in ChatGPT Desktop, the Responses API surface that the CLI and editor extensions call, and Login. If any of those three is degraded, Codex is affected regardless of what the global indicator says."
+        }
+      }
+    ]
+  }
+  </script>
+<!-- theme:generated -->
+<script>
+  (function () {
+    var d = document.documentElement, t = null;
+    try { t = localStorage.getItem("snackpack.theme.v1"); } catch (e) {}
+    if (t !== "dark" && t !== "light" && t !== "cream") {
+      // Dark for everyone on a first visit, not conditional on the OS: this
+      // site is designed dark and that is what it should be judged on.
+      t = "dark";
+    }
+    d.setAttribute("data-theme", t);
+    d.setAttribute("data-theme-default", "dark");
+  })();
+</script>
+<script defer src="theme.js"></script>
+<!-- /theme:generated -->
+</head>
+<body data-state="up">
+  <main class="wrap legal">
+    <header class="topbar">
+      <a class="brand" href="/">iscodexup<span class="dot">.com</span></a>
+<!-- nav:generated -->
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="index.html">Status</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="guides.html">Guides</a></li>
+        <li><a href="badge.html">Badge</a></li>
+        <li><a href="sponsor.html">Sponsor</a></li>
+      </ul>
+    </nav>
+<!-- /nav:generated -->
+    </header>
+
+    <h1>OpenAI status vs Codex status: why they disagree</h1>
+    <p class="legal-updated">The official page is not lying to you. It is answering a different question.</p>
+
+    <p>
+      It is a familiar moment: Codex is plainly broken, you open OpenAI's status page hoping
+      for confirmation, and it is a wall of green. That mismatch has three separate causes,
+      and knowing which one you are looking at tells you how long to wait.
+    </p>
+
+    <h2>Cause 1: the global indicator averages everything</h2>
+    <p>
+      OpenAI publishes roughly <strong>25 components</strong> &mdash; images, audio, search,
+      fine-tuning, batch, embeddings, moderation, Sora, and so on. The single indicator at the
+      top of the page summarises all of them at once. A failure confined to the handful of
+      components Codex actually uses barely moves that average, so the headline stays green
+      while your CLI stays broken.
+    </p>
+    <p>
+      This is precisely why this site exists. Our verdict is <strong>scoped</strong> to the
+      components Codex depends on rather than to the global roll-up:
+    </p>
+    <ul>
+      <li><strong>Codex in ChatGPT Desktop</strong> &mdash; the only explicitly Codex-named component OpenAI publishes.</li>
+      <li><strong>Responses</strong> &mdash; the API surface the Codex CLI and editor extensions actually call.</li>
+      <li><strong>Login</strong> &mdash; no authentication, no Codex, no matter how healthy everything else is.</li>
+    </ul>
+    <p>
+      If any one of those is degraded, we say so, even when OpenAI's global indicator is green.
+      Conversely, if Sora is having a terrible day and Codex is fine, we stay green while the
+      official page may not.
+    </p>
+
+    <h2>Cause 2: status pages lag reality</h2>
+    <p>
+      Every status page in the industry works the same way: an incident is posted once a human
+      has confirmed it. Between the first failing request and the first status update there is
+      a gap, routinely <strong>ten to thirty minutes</strong> and occasionally much longer for
+      partial degradations that are hard to distinguish from noise.
+    </p>
+    <p>
+      So &ldquo;the status page says it is fine&rdquo; is weak evidence in the first half hour
+      of an incident and strong evidence after it. If you are five minutes into a problem,
+      trust your own failing requests over the green tick.
+    </p>
+
+    <h2>Cause 3: it genuinely is not them</h2>
+    <p>
+      The uncomfortable third option. If the status feed is green, we are green, and your
+      requests still fail, the cause is very likely local &mdash; an expired session, a rate
+      limit, or a proxy. We have a page for each:
+      <a href="codex-cli-not-working.html">CLI troubleshooting</a> and
+      <a href="codex-rate-limits.html">rate limits</a>.
+    </p>
+
+    <h2>Which should you trust?</h2>
+    <ul>
+      <li><strong>For &ldquo;can I work right now?&rdquo;</strong> &mdash; a Codex-scoped check like this one, because it ignores the 22 components you do not use.</li>
+      <li><strong>For &ldquo;what actually broke, and is there an ETA?&rdquo;</strong> &mdash; <a href="https://status.openai.com" target="_blank" rel="noopener">OpenAI's official page</a>, because incident write-ups and resolution notes only exist there.</li>
+      <li><strong>For &ldquo;is this normal?&rdquo;</strong> &mdash; <a href="history.html">our outage history</a>, which counts how often this has happened before.</li>
+    </ul>
+    <p>
+      They are complements, not competitors. We read OpenAI's feed &mdash; we simply read a
+      different slice of it than the front page does.
+    </p>
+
+    <h2>A note on what we are not</h2>
+    <p>
+      This is an independent, unaffiliated project. We do not have privileged information, we
+      do not probe OpenAI's infrastructure, and we cannot tell you when an incident will be
+      resolved. Everything here derives from the same public feed you can read yourself &mdash;
+      the value we add is the scoping and the plain-English verdict, not inside knowledge.
+    </p>
+
+    <h2>Related</h2>
+    <ul>
+      <li><a href="codex-cli-not-working.html">Codex CLI not working? Work down this list</a></li>
+      <li><a href="codex-rate-limits.html">Codex rate limits: why you hit them and when they reset</a></li>
+      <li><a href="history.html">Codex outage history</a></li>
+      <li><a href="badge.html">Embed a live Codex status badge</a></li>
+    </ul>
+
+    <p class="badge-note">
+      Not affiliated with, endorsed by, or sponsored by OpenAI. OpenAI and Codex are
+      trademarks of OpenAI. Status is read from the official
+      <a href="https://status.openai.com" target="_blank" rel="noopener">status.openai.com</a> feed.
+    </p>
+
+    <footer class="foot">
+      <p class="foot-main">&copy; 2026 Is Codex Up &mdash; a project of Snackpack Universe.</p>
+      <p class="foot-legal">
+        <a href="/">Live status</a> &middot; <a href="history.html">Outage history</a> &middot;
+        <a href="guides.html">Guides</a> &middot;
+        <a href="privacy.html">Privacy</a> &middot; <a href="sponsor.html">Sponsor</a>
+      </p>
+    </footer>
+  </main>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "cd86c3d12ce84ba78d722eaa217163dc"}'></script>
+<!-- End Cloudflare Web Analytics -->
+</body>
+</html>

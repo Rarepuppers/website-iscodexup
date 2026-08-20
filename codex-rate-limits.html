@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codex Rate Limits: Why You Hit Them and When They Reset</title>
+  <meta name="description" content="Hit a Codex usage limit? How to tell a rate limit apart from an outage, what the limits actually are, when they reset, and what to do while you wait." />
+  <meta name="robots" content="all" />
+  <link rel="canonical" href="https://iscodexup.com/codex-rate-limits.html" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <meta property="og:title" content="Codex Rate Limits: Why You Hit Them and When They Reset" />
+  <meta property="og:description" content="How to tell a Codex rate limit apart from an outage, and what to do while you wait." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://iscodexup.com/codex-rate-limits.html" />
+  <meta property="og:image" content="https://iscodexup.com/assets/og-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Codex down, or have I hit a rate limit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A rate limit is specific to your account and names itself in the error — you will see wording about usage, quota or limits, and it usually arrives instantly. An outage affects everyone, tends to show as a connection error, timeout or 5xx server error, and is visible on OpenAI's status feed. If iscodexup.com says Codex is up and you are still blocked, it is almost certainly your own limit."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When do Codex usage limits reset?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Codex plans use rolling windows rather than a fixed daily clock. A shorter window typically frees up within hours of the requests that consumed it, and a longer window refills on a rolling multi-day basis. Because the window is rolling, capacity returns gradually rather than all at once at midnight."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does a failed Codex request still count against my limit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A request rejected by the rate limiter itself does not consume quota. A request that was accepted, ran, and then failed part-way generally does consume whatever it processed before failing — which is why retrying a long agent run repeatedly during an incident can burn through capacity quickly."
+        }
+      }
+    ]
+  }
+  </script>
+<!-- theme:generated -->
+<script>
+  (function () {
+    var d = document.documentElement, t = null;
+    try { t = localStorage.getItem("snackpack.theme.v1"); } catch (e) {}
+    if (t !== "dark" && t !== "light" && t !== "cream") {
+      // Dark for everyone on a first visit, not conditional on the OS: this
+      // site is designed dark and that is what it should be judged on.
+      t = "dark";
+    }
+    d.setAttribute("data-theme", t);
+    d.setAttribute("data-theme-default", "dark");
+  })();
+</script>
+<script defer src="theme.js"></script>
+<!-- /theme:generated -->
+</head>
+<body data-state="up">
+  <main class="wrap legal">
+    <header class="topbar">
+      <a class="brand" href="/">iscodexup<span class="dot">.com</span></a>
+<!-- nav:generated -->
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="index.html">Status</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="guides.html">Guides</a></li>
+        <li><a href="badge.html">Badge</a></li>
+        <li><a href="sponsor.html">Sponsor</a></li>
+      </ul>
+    </nav>
+<!-- /nav:generated -->
+    </header>
+
+    <h1>Codex rate limits: why you hit them, and when they reset</h1>
+    <p class="legal-updated">The short version: if this site says Codex is up and you are still blocked, you have hit your own limit, not an outage.</p>
+
+    <p>
+      Every Codex outage brings a wave of people who are not actually experiencing an
+      outage. They have hit a usage limit, the error is vague, and a rate limit at 11pm
+      feels exactly like the service being down. This page is how to tell the difference
+      in about ten seconds, and what your options are once you know.
+    </p>
+
+    <h2>Step one: is it you, or is it them?</h2>
+    <p>
+      Check <a href="/">the live status</a> first. It reads OpenAI's official feed, scoped
+      to the components Codex actually depends on. Then match your symptom against this:
+    </p>
+
+    <h3>It is a rate limit if&hellip;</h3>
+    <ul>
+      <li>The error names it — anything mentioning <strong>usage</strong>, <strong>quota</strong>, <strong>limit</strong> or <strong>429</strong>.</li>
+      <li>It arrives <strong>instantly</strong>, with no hanging or spinner. Limiters reject before any work happens.</li>
+      <li>It is <strong>consistent</strong> — every request fails the same way, immediately, not one in five.</li>
+      <li>A different account or a colleague on the same network works fine.</li>
+    </ul>
+
+    <h3>It is an outage if&hellip;</h3>
+    <ul>
+      <li>You see connection errors, timeouts, or <strong>500 / 502 / 503</strong> server errors.</li>
+      <li>Requests <strong>hang</strong> before failing, rather than bouncing straight back.</li>
+      <li>It is <strong>intermittent</strong> — some requests succeed, some do not.</li>
+      <li>Other people are complaining at the same moment, and the status feed agrees.</li>
+    </ul>
+
+    <p>
+      There is a third case worth naming, because it fools almost everyone:
+      <strong>degraded but not down</strong>. Requests succeed, just very slowly, and some
+      time out on the client side and look like failures. That is why this site publishes a
+      <strong>KINDA</strong> verdict rather than forcing everything into up or down.
+    </p>
+
+    <h2>The limits you can actually hit</h2>
+    <p>
+      Codex is not governed by one number. Several separate limits sit on top of each other,
+      and they fail in different ways:
+    </p>
+    <ul>
+      <li>
+        <strong>Plan usage windows.</strong> Subscription plans meter how much agent work you
+        can do across a rolling window — typically one short window measured in hours and one
+        longer window measured in days. This is the limit most people mean when they say they
+        have been rate limited.
+      </li>
+      <li>
+        <strong>Requests per minute.</strong> A burst limit. It matters if you are running
+        parallel agents or a script, and almost never if you are typing.
+      </li>
+      <li>
+        <strong>Tokens per minute.</strong> Governed by size, not count. Long files and big
+        contexts can trip this in a single request.
+      </li>
+      <li>
+        <strong>Context window.</strong> Not a rate limit at all, but it surfaces as a
+        failure part-way through a long agent run. If the failure always happens at roughly
+        the same point in the same task, suspect this rather than a quota.
+      </li>
+    </ul>
+
+    <p>
+      The exact numbers change with your plan and change over time, so we deliberately do not
+      publish figures that would go stale — OpenAI's own
+      <a href="https://platform.openai.com/docs/guides/rate-limits" target="_blank" rel="noopener">rate limit documentation</a>
+      and your account's usage page are the only sources worth trusting for the current values.
+    </p>
+
+    <h2>When does it reset?</h2>
+    <p>
+      Rolling windows, not a midnight clock. That distinction matters more than people expect:
+      capacity comes back <strong>gradually</strong>, in the same shape you spent it. If you
+      burned a week's worth of a rolling window in one afternoon, you get it back the
+      following week in one lump. If you spread it evenly, it trickles back continuously.
+    </p>
+    <p>
+      The practical consequence: after hitting a limit, waiting a short while and trying one
+      small request is a far better strategy than hammering retry. If the small request
+      succeeds, some of your window has already refilled.
+    </p>
+
+    <h2>How to stop hitting them</h2>
+    <ul>
+      <li>
+        <strong>Scope the task before you start.</strong> The single biggest consumer of quota
+        is an agent exploring a large repository to answer a question you could have pointed
+        it at directly.
+      </li>
+      <li>
+        <strong>Do not retry a failing long run.</strong> Work already done still counts. Three
+        attempts at a task that dies at 80% costs more than two clean completions.
+      </li>
+      <li>
+        <strong>Keep the context tight.</strong> Token limits are driven by what you attach,
+        not by how much you ask.
+      </li>
+      <li>
+        <strong>Batch your questions.</strong> One well-framed prompt beats six clarifying
+        rounds, each of which re-sends the whole conversation.
+      </li>
+      <li>
+        <strong>Watch for runaway loops.</strong> An agent stuck retrying a failing test can
+        quietly consume an entire window while you are in a meeting.
+      </li>
+    </ul>
+
+    <h2>What to do while you wait</h2>
+    <p>
+      If it is an outage, <a href="/">put your email in on the status page</a> and we will send
+      one message the moment Codex recovers — no need to keep refreshing. If it is a rate
+      limit, nothing external is going to change: the window refills on its own schedule.
+    </p>
+    <p>
+      Either way, this is a good moment to do the thing that does not need an agent — review
+      the diff you have already got, write the test you skipped, or step away entirely. There
+      is also <a href="https://www.snackpackuniverse.com/play/" target="_blank" rel="noopener">a free browser arcade</a>
+      if you would rather not think about it for ten minutes.
+    </p>
+
+    <h2>Related</h2>
+    <ul>
+      <li><a href="codex-cli-not-working.html">Codex CLI not working? Fixes to try before assuming it is down</a></li>
+      <li><a href="openai-status-vs-codex-status.html">OpenAI status vs Codex status: why they disagree</a></li>
+      <li><a href="history.html">Codex outage history — how often does it actually go down?</a></li>
+      <li><a href="badge.html">Embed a live Codex status badge</a></li>
+    </ul>
+
+    <p class="badge-note">
+      Not affiliated with, endorsed by, or sponsored by OpenAI. OpenAI and Codex are
+      trademarks of OpenAI. Nothing here is official guidance — always check
+      <a href="https://platform.openai.com/docs" target="_blank" rel="noopener">OpenAI's documentation</a>
+      for current limits.
+    </p>
+
+    <footer class="foot">
+      <p class="foot-main">&copy; 2026 Is Codex Up &mdash; a project of Snackpack Universe.</p>
+      <p class="foot-legal">
+        <a href="/">Live status</a> &middot; <a href="history.html">Outage history</a> &middot;
+        <a href="guides.html">Guides</a> &middot;
+        <a href="privacy.html">Privacy</a> &middot; <a href="sponsor.html">Sponsor</a>
+      </p>
+    </footer>
+  </main>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "cd86c3d12ce84ba78d722eaa217163dc"}'></script>
+<!-- End Cloudflare Web Analytics -->
+</body>
+</html>
