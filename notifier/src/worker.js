@@ -154,8 +154,7 @@ function recoveryEmailHtml(c) {
       <h1 style="font-size:32px;margin:0 0 8px">${c.product} is back up</h1>
       <p style="color:#a8a8b8;font-size:16px;line-height:1.5">The Codex-related components on the official status page are operational again. Back to work.</p>
       ${link}
-      <p style="color:#6a6a78;font-size:12px;margin-top:32px">You're getting this because you asked to be notified when ${c.product} recovered.
-      {{ unsubscribe }}</p>
+      <p style="color:#6a6a78;font-size:12px;margin-top:32px">You're getting this because you asked to be notified when ${c.product} recovered.</p>
     </div></body></html>`;
 }
 
