@@ -32,7 +32,7 @@ COMPONENT_INCLUDE = "Codex in ChatGPT Desktop,Responses,Login"
 # Codex notify list (Brevo → Contacts → Lists → "iscodexup", id 10).
 BREVO_LIST_ID = "10"
 SENDER_NAME = "Is Codex Up"
-# TODO(iscodexup): authenticate iscodexup.com in Brevo before this sender works.
+# iscodexup.com is authenticated in Brevo (DKIM + DMARC verified 2026-08-20).
 SENDER_EMAIL = "notify@iscodexup.com"
 
 PRODUCT = "Codex"
