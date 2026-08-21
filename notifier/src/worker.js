@@ -127,7 +127,7 @@ async function tick(env, { force = false } = {}) {
 
     if (state.inOutage && confirmed) {
       if (lastedLongEnough && outOfCooldown) {
-        await sendRecoveryCampaign(env, c, { now });
+        await sendRecoveryCampaign(env, c, { outageStart: state.outageStart, now });
         state.lastNotifiedAt = now;
         action = "recovery-sent";
       } else {
@@ -145,26 +145,67 @@ async function tick(env, { force = false } = {}) {
   return { action, indicator, state };
 }
 
-function recoveryEmailHtml(c) {
+// "34 minutes" / "1 hour 12 minutes". Returns null when there is no usable span
+// (the /test-send route has no outage start) and the duration line is then omitted.
+function formatDuration(ms) {
+  const totalMinutes = Math.round(ms / 60000);
+  if (!Number.isFinite(totalMinutes) || totalMinutes < 1) return null;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const parts = [];
+  if (hours) parts.push(`${hours} hour${hours === 1 ? "" : "s"}`);
+  if (minutes) parts.push(`${minutes} minute${minutes === 1 ? "" : "s"}`);
+  return parts.join(" ");
+}
+
+// HH:MM in UTC. The feed is UTC and subscribers span time zones, so name the zone
+// rather than guessing a local one.
+function utcClock(ms) {
+  return new Date(ms).toISOString().slice(11, 16);
+}
+
+// No image here carries information: most clients block images by default, so the
+// email must read correctly without them. The wordmark falls back to the domain as
+// alt text; the glyph is purely decorative and simply disappears.
+function recoveryEmailHtml(c, { outageStart, now } = {}) {
   const link = c.siteUrl
     ? `<p style="margin:24px 0 0"><a href="${c.siteUrl}" style="color:#7c5cff">${c.siteUrl.replace(/^https?:\/\//, "")}</a></p>`
     : "";
+
+  // The single thing this email can tell a reader that they don't already know.
+  const duration = outageStart && now ? formatDuration(now - outageStart) : null;
+  const outage = duration
+    ? `<p style="color:#8a8a9a;font-size:15px;line-height:1.5;margin:0 0 12px">${c.product} was down for ${duration} &mdash; ${utcClock(outageStart)} to ${utcClock(now)} UTC.</p>`
+    : "";
+
+  // Absolute https URLs are required in email; skip the art entirely without a site.
+  const wordmark = c.siteUrl
+    ? `<img src="${c.siteUrl}/assets/email-wordmark-codex@2x.png" width="240" height="48" alt="${c.siteUrl.replace(/^https?:\/\//, "")}" style="display:block;margin:0 auto 20px;border:0;outline:none;text-decoration:none">`
+    : "";
+  const glyph = c.siteUrl
+    ? `<img src="${c.siteUrl}/assets/email-glyph-recovered@2x.png" width="64" height="64" alt="" style="display:block;margin:0 auto 12px;border:0;outline:none;text-decoration:none">`
+    : "";
+
   return `<!DOCTYPE html><html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#0f0f12;color:#eaeaf0;padding:32px">
     <div style="max-width:480px;margin:0 auto;text-align:center">
-      <h1 style="font-size:32px;margin:0 0 8px">${c.product} is back up</h1>
-      <p style="color:#a8a8b8;font-size:16px;line-height:1.5">The Codex-related components on the official status page are operational again. Back to work.</p>
+      ${wordmark}
+      ${glyph}
+      <h1 style="font-size:32px;margin:0 0 12px">${c.product} is back up</h1>
+      <p style="color:#a8a8b8;font-size:16px;line-height:1.5;margin:0 0 12px">The Codex-related components on the official status page are operational again.</p>
+      ${outage}
+      <p style="color:#a8a8b8;font-size:16px;line-height:1.5;margin:0">Back to work.</p>
       ${link}
       <p style="color:#6a6a78;font-size:12px;margin-top:32px">You're getting this because you asked to be notified when ${c.product} recovered.</p>
     </div></body></html>`;
 }
 
-async function sendRecoveryCampaign(env, c, { now }) {
+async function sendRecoveryCampaign(env, c, { outageStart, now }) {
   const stamp = new Date(now).toISOString().slice(0, 16).replace("T", " ");
   const body = {
     name: `${c.product} recovered ${stamp} UTC`,
     subject: `${c.product} is back up`,
     sender: { name: c.senderName, email: c.senderEmail },
-    htmlContent: recoveryEmailHtml(c),
+    htmlContent: recoveryEmailHtml(c, { outageStart, now }),
     recipients: { listIds: [c.listId] },
   };
 
