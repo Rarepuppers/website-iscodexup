@@ -527,15 +527,38 @@ body[data-state="degraded"] .alternatives { display: block; }
 .waiting-room {
   display: none;
   margin: 22px auto 0;
-  max-width: 440px;
+  max-width: 620px;
   text-align: center;
 }
 body[data-state="down"] .waiting-room,
 body[data-state="degraded"] .waiting-room { display: block; }
-.waiting-room h2 { margin: 0 0 4px; font-size: 16px; color: var(--muted); font-weight: 700; }
-.waiting-room > p { color: var(--muted); font-size: 13px; margin: 0 auto 12px; }
-.waiting-room .alt-list { margin-top: 0; }
+.waiting-room > h3 { margin: 18px 0 8px; font-size: 14px; color: var(--muted); font-weight: 700; }
+.waiting-room .alt-list { margin-top: 0; max-width: 440px; }
 .waiting-room .alt-disclaimer a { color: var(--muted); }
+
+.atlas-waiting-card {
+  overflow: hidden;
+  border: 1px solid rgba(132, 204, 22, .34);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, #0b1730, #07101f);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, .24);
+  text-align: left;
+}
+.atlas-waiting-media { display: block; border-bottom: 1px solid rgba(255, 255, 255, .1); }
+.atlas-waiting-media img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; }
+.atlas-waiting-copy { padding: 20px; }
+.atlas-waiting-eyebrow { display: inline-block; margin-bottom: 8px; color: #bef264; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.atlas-waiting-copy h2 { margin: 0 0 8px; color: #f8fafc; font-size: clamp(22px, 5vw, 30px); line-height: 1.08; }
+.atlas-waiting-copy p { margin: 0; color: #cbd5e1; font-size: 14px; line-height: 1.55; }
+.atlas-waiting-cta { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 16px; padding: 0 16px; border-radius: 999px; background: #bef264; color: #17230c; font-weight: 800; text-decoration: none; transition: transform .15s ease, background .15s ease; }
+.atlas-waiting-cta:hover,
+.atlas-waiting-cta:focus-visible { background: #d9f99d; transform: translateY(-1px); }
+.atlas-waiting-copy small { display: block; margin-top: 12px; color: #94a3b8; font-size: 11px; line-height: 1.45; }
+
+@media (max-width: 520px) {
+  .atlas-waiting-copy { padding: 17px; }
+  .atlas-waiting-media img { aspect-ratio: 4 / 3; }
+}
 
 /* ---------- COMPANION TOOLS (always visible — pairs WITH the product, not a substitute) ---------- */
 /* Deliberately separate from .alternatives: these are not outage fallbacks, so they

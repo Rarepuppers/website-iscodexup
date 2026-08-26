@@ -264,21 +264,31 @@
       <p class="alt-disclaimer">Some links may be sponsored or affiliate links. We only list tools we'd actually use.</p>
     </section>
 
-    <!-- WAITING ROOM — outage only. The footer already links the arcade, but nobody
-         scrolls a status page. This is the one moment the offer is genuinely useful:
-         the reader is blocked, has nothing to do, and is going to sit on this tab.
-         Kept deliberately quieter than .alternatives so the backup-tools slot stays
-         the centrepiece. Plain hrefs (no UTM) — Cloudflare reports referrer host,
-         which is enough to measure this. -->
+    <!-- WAITING ROOM — outage only. Atlas is first-party studio content, not a
+         sponsor placement; the independent sponsor rail remains unchanged. -->
     <section class="waiting-room">
-      <h2>Nothing to do while you wait?</h2>
-      <p>Our own arcade — free in the browser, no ads, no sign-in, nothing to install.</p>
+      <article class="atlas-waiting-card">
+        <a class="atlas-waiting-media" href="https://atlas.snackpackuniverse.com/" target="_blank" rel="noopener" aria-label="Play Atlas Quest while Codex recovers">
+          <picture>
+            <source srcset="assets/atlas/atlas-quest-gameplay.webp" type="image/webp">
+            <img src="assets/atlas/atlas-quest-gameplay.png" alt="Atlas Quest showing its physical globe during a country-finding round." width="1440" height="900" loading="lazy" decoding="async">
+          </picture>
+        </a>
+        <div class="atlas-waiting-copy">
+          <span class="atlas-waiting-eyebrow">While your AI employee reboots</span>
+          <h2>Explore the world with Atlas Quest</h2>
+          <p>Sharpen your geography and have some fun while Codex finds its way back. Free, ad-free, and playable in your browser.</p>
+          <a class="atlas-waiting-cta" href="https://atlas.snackpackuniverse.com/" target="_blank" rel="noopener">Play Atlas Quest <span aria-hidden="true">&rarr;</span></a>
+          <small>No sign-in. Progress stays on your device. Offline-ready after your first visit.</small>
+        </div>
+      </article>
+      <h3>Prefer a quick classic?</h3>
       <ul class="alt-list">
         <li><a href="https://www.snackpackuniverse.com/play/solitaire/?utm_source=iscodexup&utm_medium=waiting-room&utm_campaign=solitaire" target="_blank" rel="noopener">Solitaire</a> <span>every deal solver-checked winnable</span></li>
         <li><a href="https://www.snackpackuniverse.com/play/sudoku/?utm_source=iscodexup&utm_medium=waiting-room&utm_campaign=sudoku" target="_blank" rel="noopener">Sudoku</a> <span>four difficulties, pencil notes</span></li>
         <li><a href="https://www.snackpackuniverse.com/play/minesweeper/?utm_source=iscodexup&utm_medium=waiting-room&utm_campaign=minesweeper" target="_blank" rel="noopener">Minesweeper</a> <span>the timeless coffee-break classic</span></li>
       </ul>
-      <p class="alt-disclaimer">Made by us. No affiliate links, no catch — <a href="https://www.snackpackuniverse.com/play/?utm_source=iscodexup&amp;utm_medium=waiting-room&amp;utm_campaign=arcade-hub">30+ more games</a>.</p>
+      <p class="alt-disclaimer">Made by us. No affiliate links, no catch — <a href="https://www.snackpackuniverse.com/play/">30+ more games</a>.</p>
     </section>
 
     <!-- COMPANION TOOLS — pairs WITH Codex (not an outage fallback), so it shows in the calm view too.
@@ -476,6 +486,12 @@
       </p>
       <p class="foot-network">
         Also checking Anthropic? <a href="https://isclaudeup.com/" target="_blank" rel="noopener">Visit isclaudeup.com</a>.
+      </p>
+      <p class="foot-network" aria-label="SnackPack status network">
+        Status network:
+        <a href="https://isclaudeup.com/">Is Claude Up?</a> ·
+        <a href="https://isclaudedown.com/">Is Claude Down?</a> ·
+        <strong>Is Codex Up?</strong>
       </p>
       <p class="foot-network">
         Waiting out an outage? Play
