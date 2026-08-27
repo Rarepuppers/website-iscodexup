@@ -6,7 +6,7 @@
 // script.js/config.js cache-first, so returning visitors kept running whatever
 // build they first installed — a fixed bug would never reach them. Code and markup
 // are now network-first (below); only images stay cache-first.
-const CACHE = "iscodexup-shell-v6";
+const CACHE = "iscodexup-shell-v7";
 const SHELL = [
   "./",
   "./index.html",
@@ -23,6 +23,7 @@ const SHELL = [
   "./assets/codex-status-down-offline-red-transparent.webp",
   "./assets/codex-status-unknown-yellow-transparent.webp",
   "./assets/atlas/atlas-quest-gameplay.webp",
+  "./assets/atlas-quest-mark.svg",
 ];
 
 self.addEventListener("install", (e) => {

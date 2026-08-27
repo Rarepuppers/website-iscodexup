@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Atlas Quest compass globe</title>
+  <desc id="desc">A circular globe grid crossed by a north-pointing compass needle.</desc>
+  <defs>
+    <linearGradient id="rim" x1="8" y1="7" x2="55" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffd66b"/><stop offset=".5" stop-color="#e6ad49"/><stop offset="1" stop-color="#5fd0ff"/>
+    </linearGradient>
+    <radialGradient id="sea" cx="36%" cy="28%" r="74%">
+      <stop stop-color="#19345d"/><stop offset="1" stop-color="#0a1428"/>
+    </radialGradient>
+    <clipPath id="globe-clip"><circle cx="32" cy="32" r="23"/></clipPath>
+  </defs>
+  <circle cx="32" cy="32" r="28.5" fill="#070b16" stroke="#253653"/>
+  <circle cx="32" cy="32" r="23" fill="url(#sea)" stroke="url(#rim)" stroke-width="2"/>
+  <g clip-path="url(#globe-clip)" fill="none" stroke="#9dc8e4" stroke-linecap="round" opacity=".58">
+    <ellipse cx="32" cy="32" rx="10.5" ry="23"/>
+    <path d="M9 32h46M12.5 21.5c12 5.2 27 5.2 39 0M12.5 42.5c12-5.2 27-5.2 39 0"/>
+  </g>
+  <path d="M32 3.5l4.6 16.8L32 26l-4.6-5.7L32 3.5Z" fill="#ffd66b" stroke="#070b16" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M32 60.5l-3.4-12.8L32 43l3.4 4.7L32 60.5Z" fill="#5fd0ff" opacity=".82"/>
+  <circle cx="32" cy="32" r="3.4" fill="#f2ece0" stroke="#070b16" stroke-width="1.6"/>
+</svg>

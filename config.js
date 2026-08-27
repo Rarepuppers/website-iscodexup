@@ -94,15 +94,22 @@ window.SITE = {
   },
 
   // Sponsor rail placements, rendered by rails.js into the two fixed corner
-  // rails. Empty = the right rail shows only the "Advertise here" offer, which
-  // is the correct state until something is actually sold.
+  // rails. The final card in the right rail is always the visually distinct
+  // "Advertise here" offer, even when house sponsors are configured.
   //
   //   { name: "Acme", blurb: "Ship faster.", url: "https://acme.dev",
   //     logo: "assets/acme.png" }   // logo optional, falls back to the initial
   //
   // Entries need both `name` and `url` or they are skipped. Links are emitted
   // rel="sponsored noopener" so a paid placement never passes ranking signal.
-  sponsors: [],
+  sponsors: [
+    {
+      name: "Atlas Quest",
+      blurb: "Free world geography games for your next five-minute break.",
+      url: "https://atlas.snackpackuniverse.com/",
+      logo: "assets/atlas-quest-mark.svg",
+    },
+  ],
 
 
   // OpenAI exposes ~25 services. This site's YES/NO verdict is scoped to the

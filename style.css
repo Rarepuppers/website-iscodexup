@@ -782,14 +782,28 @@ body[data-state="degraded"] .waiting-room { display: block; }
 
 .rail-card:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
-/* The "this space is available" variant. Dashed, so it reads as an offer rather
-   than as a real placement someone paid for. */
-.rail-card--offer { border-style: dashed; border-color: #39404e; }
+/* Sponsor placements are solid, elevated tiles. The sales invitation is a
+   flatter dashed card, so nobody can mistake it for an active sponsor. */
+.rail-card:not(.rail-card--offer) {
+  padding-top: 24px;
+  border-color: #3b4658;
+  background: linear-gradient(145deg, var(--card), #171b23);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+}
+
+.rail-card--offer {
+  border-style: dashed;
+  border-color: var(--warn);
+  background: transparent;
+  box-shadow: none;
+}
+
+.rail-card--offer .rail-copy strong { color: var(--warn); }
 
 .rail-label {
   position: absolute;
-  top: 5px;
-  right: 9px;
+  top: 7px;
+  left: 12px;
   font-size: 7px;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -844,6 +858,7 @@ body[data-state="degraded"] .waiting-room { display: block; }
 @media (min-width: 1280px) and (min-height: 600px) {
   .rail { width: 200px; gap: 14px; }
   .rail-card { padding: 12px; gap: 10px; }
+  .rail-card:not(.rail-card--offer) { padding-top: 26px; }
   .rail-copy strong { font-size: 13px; }
   .rail-copy span { display: block; }
 }
