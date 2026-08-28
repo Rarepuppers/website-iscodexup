@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
-// Sponsor rails — shared file, identical on isclaudeup.com and iscodexup.com.
-// KEEP THE TWO COPIES IN SYNC (see FORK.md).
+// Sponsor rails — shared file, byte-identical on isclaudeup.com,
+// isclaudedown.com and iscodexup.com. KEEP THE THREE COPIES IN SYNC (see FORK.md).
 //
 // Renders the two fixed corner rails from `window.SITE.sponsors`. Per-site data
 // lives in config.js, because the two sites will not necessarily sell the same
@@ -18,6 +18,10 @@
 //       logo: "assets/acme.png" }   // logo optional; falls back to the initial
 //   ]
 //
+// The offer card's own words are per-site too, because "the minute Claude goes
+// down" only makes sense on the Claude sites. Set `sponsorOffer: { title, blurb }`
+// in config.js; the neutral wording below is the fallback.
+//
 // Anything with a `url` is rendered rel="sponsored noopener" per Google's
 // guidance for paid links, so a placement can never pass PageRank and put the
 // site's own search standing at risk.
@@ -26,6 +30,12 @@
   "use strict";
 
   var OFFER_URL = "sponsor.html";
+
+  // Fallback offer copy. Deliberately addressed to a would-be sponsor and not to
+  // the developer reading the page: "this space is available" only restates what
+  // an empty dashed box already says, so the line is spent on who they'd reach.
+  var OFFER_TITLE = "Sponsor this page";
+  var OFFER_BLURB = "Reach developers the minute their AI goes down.";
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -64,11 +74,11 @@
     }
     node.appendChild(mark);
 
+    var offer = (window.SITE && window.SITE.sponsorOffer) || {};
+
     var copy = el("span", "rail-copy");
-    copy.appendChild(el("strong", null, isOffer ? "Advertise here" : data.name));
-    var blurb = isOffer
-      ? "This space is available. Reach developers mid-outage."
-      : data.blurb;
+    copy.appendChild(el("strong", null, isOffer ? (offer.title || OFFER_TITLE) : data.name));
+    var blurb = isOffer ? (offer.blurb || OFFER_BLURB) : data.blurb;
     if (blurb) copy.appendChild(el("span", null, blurb));
     node.appendChild(copy);
 
