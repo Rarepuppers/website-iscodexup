@@ -867,3 +867,30 @@ body[data-state="degraded"] .waiting-room { display: block; }
   .rail-card { transition: none; }
   .rail-card:hover, .rail-card:focus-visible { transform: none; }
 }
+
+/* ---------- OUTAGE EMAIL PROMPT (outage only) ---------- */
+/* Same gating as .alternatives and .waiting-room. The signup form itself stays
+   where it is; this is a prompt, not a second form, so the account keeps one
+   list and nobody can sign up to the same thing twice. */
+.outage-capture {
+  display: none;
+  margin: 14px auto 0;
+  max-width: 460px;
+  text-align: center;
+}
+body[data-state="down"] .outage-capture,
+body[data-state="degraded"] .outage-capture { display: block; }
+.outage-capture-link {
+  display: inline-block;
+  padding: 10px 16px;
+  border: 1px solid var(--down);
+  border-radius: 10px;
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  line-height: 1.35;
+}
+.outage-capture-link:hover,
+.outage-capture-link:focus-visible { border-color: var(--fg); }
+body[data-state="degraded"] .outage-capture-link { border-color: var(--warn); }

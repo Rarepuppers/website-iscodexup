@@ -232,6 +232,18 @@
         <span class="share-label">Share this page</span>
       </button>
 
+
+      <!-- OUTAGE EMAIL PROMPT (outage only) -- the signup form is four sections
+           below this, which is fine on a calm day and wrong during an outage:
+           the offer is only worth anything while the verdict reads NO. Same
+           gating as .alternatives. Anchors to the one existing form; there is
+           deliberately no second form and no second list. -->
+      <p class="outage-capture">
+        <a class="outage-capture-link" href="#signup">
+          Codex is down &mdash; email me the second it's back &darr;
+        </a>
+      </p>
+
       <!-- Sister site. The .alternatives block below is hidden while Codex is up, so
            without this line the cross-link only exists in the footer on a calm day. -->
       <p class="sister">
@@ -309,7 +321,7 @@
     -->
 
     <!-- NEWSLETTER (the real asset) -->
-    <section class="signup">
+    <section class="signup" id="signup">
       <h2>Get pinged the second it's back up</h2>
       <p>Drop your email and get back to work the instant Codex recovers.</p>
 
