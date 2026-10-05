@@ -220,11 +220,6 @@
       </button>
       <p class="quote" id="quote"></p>
 
-      <p class="counter">
-        <span id="count" class="odometer" aria-label="panic checks in the last 24 hours"></span>
-        panic-checks in the last 24h
-      </p>
-
       <!-- The link gets pasted into Slack/X during outages — that's basically all our
            organic reach. Make it one tap. Native share sheet on mobile, clipboard elsewhere. -->
       <button class="share" id="share" type="button" aria-label="Share this page">
@@ -587,7 +582,6 @@
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function () {
           var res = null; try { res = JSON.parse(xhr.response); } catch (e) {}
-          console.log('[signup] Brevo response (' + xhr.status + '):', res || xhr.response);
           if (xhr.status >= 200 && xhr.status < 300 && !(res && res.errors)) showSuccess();
           else showError(res);
         });

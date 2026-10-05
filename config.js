@@ -247,7 +247,7 @@ window.SITE = {
     "I have become the human in the loop. Horrifying.",
     "Codex is down and somehow my impostor syndrome is up.",
     "Every refresh is a tiny incident response drill.",
-    "The only thing operational right now is my panic counter.",
+    "The only thing operational right now is my refresh button.",
     "I am going to write code unaided, like a historical reenactment.",
     "If anyone asks, I am doing resilience testing.",
     "My vibe coding has become vibe waiting.",
@@ -353,7 +353,7 @@ window.SITE = {
     "If I open Claude now, Alex Albert wins. I refuse.",
     "Alex Albert's timeline is suspiciously cheerful this morning.",
     "I'd defect to the Claude side, but I'd have to learn a whole new CLI.",
-    "Do not let Alex Albert see the panic counter.",
+    "Do not let Alex Albert see how often I refresh.",
     "I will not give Alex Albert the satisfaction. I will simply sit here.",
     "Alex Albert is out there shipping and I am out here refreshing.",
 

@@ -290,8 +290,6 @@ body[data-state="down"] .smash img { filter: drop-shadow(0 0 18px rgba(220, 38, 
 }
 .quote.show { opacity: 1; }
 
-.counter { color: var(--muted); font-size: 14px; margin-top: 18px; }
-
 /* ---------- SHARE + SISTER SITE ---------- */
 /* Deliberately quiet: the smash button is the hero, this sits under it. */
 .share {
@@ -328,44 +326,6 @@ body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
 }
 .sister a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
 .sister a:hover, .sister a:focus-visible { color: var(--fg); }
-
-/* ---------- SPLIT-FLAP ODOMETER ---------- */
-.odometer {
-  display: inline-flex;
-  gap: 2px;
-  vertical-align: middle;
-  perspective: 240px;
-}
-.odometer .cell {
-  display: inline-block;
-  min-width: 0.72em;
-  text-align: center;
-  font-weight: 800;
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-  color: var(--fg);
-  background: #000;
-  border-radius: 4px;
-  padding: 3px 2px;
-  margin: 0 1px;
-  box-shadow: inset 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0,0,0,.6);
-  /* faux split-flap seam */
-  background-image: linear-gradient(transparent 49%, rgba(0,0,0,.55) 49%, rgba(0,0,0,.55) 51%, transparent 51%);
-  backface-visibility: hidden;
-}
-.odometer .comma {
-  background: none;
-  box-shadow: none;
-  color: var(--muted);
-  min-width: 0.28em;
-  padding: 3px 0;
-}
-.odometer .cell.flipping { animation: flap .26s ease-in-out; }
-@keyframes flap {
-  0%   { transform: rotateX(0deg); }
-  50%  { transform: rotateX(88deg); }
-  100% { transform: rotateX(0deg); }
-}
 
 /* ---------- SECTIONS ---------- */
 .signup, .components {
