@@ -1,0 +1,69 @@
+.season-toggle { flex: none; margin-inline-start: 5px; }
+.season-dialog {
+  box-sizing: border-box;
+  width: min(25rem, calc(100% - 2rem));
+  padding: 1.4rem;
+  border: 1px solid var(--season-line, #8e9fac);
+  border-radius: 1rem;
+  color: var(--season-ink, #182a35);
+  background: var(--season-panel, #f5faff);
+  text-align: left;
+}
+.season-dialog::backdrop { background: #091828a6; }
+.season-dialog h2 { margin: 0 0 1rem; color: inherit; font: 750 1.4rem/1.2 system-ui, sans-serif; }
+.season-dialog p { margin: .8rem 0; }
+.season-dialog .season-help { font-size: .88rem; }
+.season-field { display: grid; gap: .25rem; font-weight: 700; }
+.season-dialog select, .season-dialog button {
+  min-height: 2.75rem; padding: .4rem .7rem; border: 1px solid var(--season-line, #8e9fac);
+  border-radius: .5rem; background: var(--season-panel, #f5faff);
+  color: inherit; font: inherit;
+}
+.season-dialog button { cursor: pointer; font-weight: 700; }
+.season-dialog :focus-visible, .season-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+:root[data-theme="dark"] .season-dialog { --season-panel: #182631; --season-ink: #f2f6ff; --season-line: #91a0b3; }
+
+:root[data-season="winter"] {
+  --winter-landscape: url("assets/winter-alpine.webp");
+  --winter-tint: #b8d7ef;
+}
+:root[data-season="winter"][data-winter-scene="1"] {
+  --winter-landscape: url("assets/winter-aurora.webp");
+  --winter-tint: #c4c2f0;
+}
+:root[data-season="winter"][data-winter-scene="2"] {
+  --winter-landscape: url("assets/winter-pines.webp");
+  --winter-tint: #b2d4de;
+}
+:root[data-season="winter"][data-winter-scene="3"] {
+  --winter-landscape: url("assets/winter-ice.webp");
+  --winter-tint: #b8dfd5;
+}
+:root[data-season="winter"] body {
+  --winter-veil: #f0f6fbe8;
+  background-image: linear-gradient(180deg, var(--winter-veil), transparent 30rem, var(--bg) 51rem),
+    var(--winter-landscape);
+  background-size: 100% 51rem, max(100%, 76rem) 46rem;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+:root[data-season="winter"][data-theme="dark"] body { --winter-veil: #0d1427c4; }
+:root[data-season="winter"] .topbar,
+:root[data-season="winter"] .wrap > .history-intro,
+:root[data-season="winter"] .wrap > .legal,
+:root[data-season="winter"] .wrap > .faq,
+:root[data-season="winter"] .tv {
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+}
+:root[data-season="winter"] .topbar { padding: .65rem .85rem; }
+:root[data-season="winter"] .tv {
+  margin-top: .75rem;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--winter-tint) 38%, transparent);
+}
+:root[data-season="winter"] .wrap > .history-intro,
+:root[data-season="winter"] .wrap > .legal { margin-top: .8rem; padding: 1rem; }
+
+.waiting-room .alt-list .winter-break { display: none; }
+:root[data-season="winter"] .waiting-room .alt-list .winter-break { display: list-item; }

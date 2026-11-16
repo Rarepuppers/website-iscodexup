@@ -22,6 +22,8 @@ import path from "node:path";
  */
 
 const root = path.resolve(".");
+const rotationOffset = { "iscodexup.com": 1, "isclaudedown.com": 2, "isclaudeup.com": 3 };
+const hostname = (await fs.readFile(path.join(root, "CNAME"), "utf8")).trim();
 
 const THEME_OPEN = "<!-- theme:generated -->";
 const THEME_CLOSE = "<!-- /theme:generated -->";
@@ -48,6 +50,8 @@ const HEAD_BLOCK = [
   "  })();",
   "</script>",
   '<script defer src="theme.js"></script>',
+  '<link rel="stylesheet" href="seasonal-appearance.css">',
+  `<script src="seasonal-appearance.js" data-rotation-offset="${rotationOffset[hostname] ?? 0}"></script>`,
   THEME_CLOSE,
 ].join("\n");
 
@@ -108,7 +112,7 @@ for (const file of files) {
   const before = html;
 
   // --- theme block ---
-  const themeRe = new RegExp(`${THEME_OPEN}[\\s\\S]*?${THEME_CLOSE}\\n?`, "g");
+  const themeRe = new RegExp(`${THEME_OPEN}[\\s\\S]*?${THEME_CLOSE}\\r?\\n?`, "g");
   if (themeRe.test(html)) {
     html = html.replace(themeRe, HEAD_BLOCK + "\n");
   } else if (html.includes("</head>")) {
@@ -119,7 +123,7 @@ for (const file of files) {
 
   // --- nav block ---
   const navBlock = navFor(file);
-  const navRe = new RegExp(`${NAV_OPEN}[\\s\\S]*?${NAV_CLOSE}\\n?`, "g");
+  const navRe = new RegExp(`${NAV_OPEN}[\\s\\S]*?${NAV_CLOSE}\\r?\\n?`, "g");
   if (navRe.test(html)) {
     html = html.replace(navRe, navBlock + "\n");
   } else {
